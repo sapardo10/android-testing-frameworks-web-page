@@ -1,0 +1,24 @@
+{
+  "name": "android-testing-frameworks-web-page",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"cd backend && node server.js\" \"cd client && npm start\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sapardo10/android-testing-frameworks-web-page.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sapardo10/android-testing-frameworks-web-page/issues"
+  },
+  "homepage": "https://github.com/sapardo10/android-testing-frameworks-web-page#readme",
+  "dependencies": {
+    "concurrently": "^4.1.0"
+  }
+}

@@ -74,3 +74,6 @@ typings/
 
 # FuseBox cache
 .fusebox/
+webpage/src/security/serviceAccountKey.json
+backend/config.js
+*.env

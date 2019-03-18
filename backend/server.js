@@ -2,19 +2,19 @@ const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require("morgan");
-const Data = require("./data");
+const Data = require("./schemas/data");
 const cors = require('cors');
+var technologies = require('./routes/technologies');
+
 const MONGO_USER = process.env.MONGO_USER;
-const MONG_PASSWORD = process.env.MONG_PASSWORD;
+const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
 
 const API_PORT = 3001;
 const app = express();
 const router = express.Router();
 
-// this is our MongoDB database
-const dbRoute = "mongodb://"+MONGO_USER+":"+MONG_PASSWORD+"@ds147905.mlab.com:47905/android-testing-technologies";
+const dbRoute = "mongodb://"+'webpage'+":"+'elgatodejuan3'+"@ds147905.mlab.com:47905/android-testing-technologies";
 
-// connects our back end code with the database
 mongoose.connect(
   dbRoute,
   { useNewUrlParser: true }
@@ -27,12 +27,11 @@ db.once("open", () => console.log("connected to the database"));
 // checks if connection with the database is successful
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
-// (optional) only made for logging and
-// bodyParser, parses the request body to be a readable json format
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(logger("dev"));
 app.use(cors());
+app.use('/technologies', technologies);
 
 // this is our get method
 // this method fetches all available data in our database

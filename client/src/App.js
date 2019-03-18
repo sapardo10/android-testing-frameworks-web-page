@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
+import CreateTechnology from './components/createTechnology';
+import CreateTechnique from "./components/createTechnique";
 
 class App extends Component {
   // initialize our state 
@@ -104,6 +106,8 @@ class App extends Component {
     const { data } = this.state;
     return (
       <div>
+        <CreateTechnology/>
+        <CreateTechnique/>
         <ul>
           {data.length <= 0
             ? "NO DB ENTRIES YET"

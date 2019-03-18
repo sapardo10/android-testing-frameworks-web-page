@@ -11,9 +11,10 @@ export default class CreateTechnique extends Component {
     }
 
     putDataToDB = () => {
-        axios.post("http://localhost:3001/technique/create", {
+        axios.post("http://localhost:3001/techniques/create", {
             id: this.state.id,
             name: this.state.name,
+            description: this.state.description,
             type: this.state.type
         });
     };

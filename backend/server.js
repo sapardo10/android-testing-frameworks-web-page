@@ -5,6 +5,7 @@ const logger = require("morgan");
 const Data = require("./schemas/data");
 const cors = require('cors');
 var technologies = require('./routes/technologies');
+var techniques = require('./routes/techniques');
 
 const MONGO_USER = process.env.MONGO_USER;
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
@@ -32,6 +33,7 @@ app.use(bodyParser.json());
 app.use(logger("dev"));
 app.use(cors());
 app.use('/technologies', technologies);
+app.use('/techniques', techniques);
 
 // this is our get method
 // this method fetches all available data in our database

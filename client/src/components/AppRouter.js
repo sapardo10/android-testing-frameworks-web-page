@@ -3,10 +3,6 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import CreateEvaluation from './createEvaluation';
 import App from '../App';
 
-function Users() {
-  return <h2>Users</h2>;
-}
-
 function AppRouter() {
   return (
     <Router>
@@ -17,17 +13,13 @@ function AppRouter() {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/compare">About</Link>
-            </li>
-            <li>
-              <Link to="/users/">Users</Link>
+              <Link to="/compare">Compare</Link>
             </li>
           </ul>
         </nav>
 
         <Route path="/" exact component={App} />
         <Route path="/compare/" component={CreateEvaluation} />
-        <Route path="/users/" component={Users} />
       </div>
     </Router>
   );

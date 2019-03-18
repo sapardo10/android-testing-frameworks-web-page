@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import axios from "axios";
 
 export default class CreateEvaluation extends Component {
   
@@ -28,6 +29,31 @@ export default class CreateEvaluation extends Component {
             .then(data => data.json())
             .then(res => this.setState({ technologies: res.data }));
     };
+
+      // our put method that uses our backend api
+  // to create new query into our data base
+  addEvaluation = () => {
+
+    axios.post("http://localhost:3001/api/createEvaluation", {
+      idtechnology: this.state.technology.id,
+      idtechnique: this.state.technique.id,
+      codesnippet: this.state.codesnippet,
+      youtubeurl: this.state.youtubeurl,
+      evaluation: this.state.evaluation,
+      numericalevaluation: this.state.numericalevaluation
+    });
+  };
+
+    // our update method that uses our backend api
+  // to overwrite existing data base information
+  updateTechnique = () => {
+    let objIdToUpdate = this.state.idtechnique;
+
+    axios.post("http://localhost:3001/techniques/update", {
+      id: objIdToUpdate,
+      update: { message: "" }
+    });
+  };
 
     renderTechniquesOptions = () => {
         return this.state.techniques.map((technique)=> {

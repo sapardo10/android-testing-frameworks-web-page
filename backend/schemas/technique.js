@@ -6,7 +6,8 @@ const TechniqueSchema = new Schema(
     id: Number,
     name: String,
     description: String,
-    type:String
+    type:String,
+    evaluations:Array
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require("morgan");
 const Data = require("./schemas/data");
+const Evaluation = require('./schemas/evaluation');
 const cors = require('cors');
 var technologies = require('./routes/technologies');
 var techniques = require('./routes/techniques');
@@ -66,20 +67,28 @@ router.delete("/deleteData", (req, res) => {
 
 // this is our create methid
 // this method adds new data in our database
-router.post("/putData", (req, res) => {
-  let data = new Data();
+router.post("/createEvaluation", (req, res) => {
+  let evaluationModel = new Evaluation();
 
-  const { id, message } = req.body;
+  const {idtechnology, idtechnique,codesnippet,youtubeurl,evaluation,numericalevaluation} = req.body;
 
-  if ((!id && id !== 0) || !message) {
+  if ((!idtechnology && idtechnology !== 0)
+      || (!idtechnique && idtechnique !== 0)
+      || !youtubeurl
+      || !evaluation
+      || !numericalevaluation) {
     return res.json({
       success: false,
       error: "INVALID INPUTS"
     });
   }
-  data.message = message;
-  data.id = id;
-  data.save(err => {
+  evaluationModel.idtechnology = idtechnology;
+  evaluationModel.idtechnique = idtechnique;
+  evaluationModel.codesnippet = codesnippet || "";
+  evaluationModel.youtubeurl = youtubeurl;
+  evaluationModel.evaluation = evaluation;
+  evaluationModel.numericalevaluation = numericalevaluation;
+  evaluationModel.save(err => {
     if (err) return res.json({ success: false, error: err });
     return res.json({ success: true });
   });

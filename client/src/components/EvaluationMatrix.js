@@ -33,38 +33,65 @@ export default class EvaluationMatrix extends Component {
     };
 
     renderTechniquesList = () => {
-        return this.state.techniques.map((technique)=> {
-            return <li 
+        return this.state.techniques.map((technique) => {
+            return <li
                 key={technique.id}
                 value={technique.id}>{technique.name}</li>
         });
     }
 
     renderTechnologiesList = () => {
-        return this.state.technologies.map((technology)=> {
-            return <li 
+        return this.state.technologies.map((technology) => {
+            return <li
                 key={technology.id}
                 value={technology.id}>{technology.name}</li>
         });
     }
 
     renderEvaluationsList = () => {
-        return this.state.evaluations.map((evaluation)=> {
+        return this.state.evaluations.map((evaluation) => {
             return <li>{evaluation.techniqueName} - {evaluation.technologyName}</li>
         });
     }
 
+    renderHeader = () => {
+        return this.state.technologies.map((technology) => {
+            return <th
+                key={technology.id}
+                value={technology.id}>{technology.name}</th>
+        });
+    }
+
+    renderRows = () => {
+        return this.state.evaluations.map((evaluation) => {
+            return <tr>
+                {evaluation.techniqueName} - {evaluation.technologyName}
+            </tr>
+        });
+    }
+
     render() {
+        console.log(this.state);
         return (
             <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th key="0" value="0"></th>
+                            {this.renderHeader()}
+                        </tr>
+                        {this.renderRows()}
+                    </tbody>
+                </table>
+
                 <ul>
-                {this.renderTechniquesList()}
+                    {this.renderTechniquesList()}
                 </ul>
                 <ul>
-                {this.renderTechnologiesList()}
+                    {this.renderTechnologiesList()}
                 </ul>
                 <ul>
-                {this.renderEvaluationsList()}
+                    {this.renderEvaluationsList()}
                 </ul>
             </div>
         )

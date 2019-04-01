@@ -33,10 +33,10 @@ export default class CreateTechnique extends Component {
     validateId = (e) => {
         const { validate } = this.state
         if (e.target.value !== "") {
-            validate.emailState = 'has-success'
+            validate.idState = 'has-success'
             this.setState({ id: e.target.value })
         } else {
-            validate.emailState = 'has-danger'
+            validate.idState = 'has-danger'
         }
         this.setState({ validate })
     }
@@ -51,6 +51,7 @@ export default class CreateTechnique extends Component {
         }
         this.setState({ validate })
     }
+
 
     validateDescription = (e) => {
         const { validate } = this.state
@@ -75,9 +76,9 @@ export default class CreateTechnique extends Component {
     }
 
     render() {
-        var message = <h1>Create technique</h1>;
+        var message = "Create technique";
         if (this.state.name !== undefined) {
-            message = <h1>Create {this.state.name} technique</h1>
+            message = "Create " + this.state.name + " technique"
         }
         return (
             <Container>
@@ -97,10 +98,10 @@ export default class CreateTechnique extends Component {
                                 <FormText>Id to identify the technique</FormText>
                                 <FormFeedback valid>
                                     Valid id!
-              </FormFeedback>
+                                </FormFeedback>
                                 <FormFeedback invalid>
                                     Please provide a valid numerical id
-              </FormFeedback>
+                                </FormFeedback>
                             </FormGroup>
                         </Col>
                         <Col>
@@ -162,8 +163,8 @@ export default class CreateTechnique extends Component {
                         </Col>
                         <Col>
                             <Button color="success" onClick={() => this.putDataToDB()}>
-                                ADD
-                        </Button>
+                                {message}
+                            </Button>
                         </Col>
                     </Form>
                 </Container>

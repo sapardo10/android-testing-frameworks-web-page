@@ -1,4 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import { Jumbotron, ListGroupItem, ListGroupItemHeading,
+ListGroup, Container } from 'reactstrap';
 
 export default class ShowTechnology extends Component {
 
@@ -33,12 +35,18 @@ export default class ShowTechnology extends Component {
             .catch(err => this.setState({ error: true }));
     }
 
-    renderTechniques = () => {
+
+    renderTechniquesList = () => {
         return this.state.evaluations.map((evaluation) => {
-            const route = "../evaluation/" + evaluation.id;
-            return <li key={evaluation.id}><a href={route}>{evaluation.techniqueName}</a></li>
-        }
-        );
+            const route = '../evaluation/' + evaluation.id;
+            return (
+                <ListGroupItem tag="a" href={route} action>
+                    <ListGroupItemHeading>{evaluation.techniqueName}</ListGroupItemHeading>
+                    
+                </ListGroupItem>
+            );
+
+        });
     }
 
     renderErrorScreen = () => {
@@ -52,25 +60,30 @@ export default class ShowTechnology extends Component {
     renderTechnologyScreen = () => {
         return (
             <div>
+                <Jumbotron>
+                    <h1 className="display-3">
+                    Technology : <a
+                    href={this.state.technology.url}>
+                    {this.state.technology.name}
+                </a></h1>
+                    <p className="lead">{this.state.technology.description}</p>
+                    <hr className="my-2" />
+                    <p className="lead">Creator : {this.state.technology.creator}</p>
+                </Jumbotron>
+                <Container>
                 <img
                     src={this.state.technology.imageurl}
                     width="200"
                     height="200"
                     alt={'Icon of ' + this.state.technology.name} />
                 <br />
-                Technology : <a
-                    href={this.state.technology.url}>
-                    {this.state.technology.name}
-                </a>
                 <br />
-                Creator : {this.state.technology.creator}
-                <br />
-                Description : {this.state.technology.description}
-                <br />
-                Evaluations:
-                <ul>
-                    {this.renderTechniques()}
-                </ul>
+                <hr/>
+                <h3>Evaluations:</h3>
+                <ListGroup>
+                    {this.renderTechniquesList()}
+                </ListGroup>
+                </Container>
             </div>
         );
     }

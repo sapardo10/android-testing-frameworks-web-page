@@ -2,12 +2,24 @@ import React, { Component } from 'react';
 import Gist from 'react-gist';
 import YouTube from 'react-youtube';
 import StarRatings from 'react-star-ratings';
+import { Jumbotron, Button, Container, Collapse } from 'reactstrap';
 
 export default class ShowTechnology extends Component {
 
-    state = {
-        evaluation: undefined,
-        error: false,
+    constructor(props) {
+        super(props);
+        this.state = {
+            evaluation: undefined,
+            error: false,
+            fadeIn: false
+        };
+        this.toggle = this.toggle.bind(this);
+    }
+
+    toggle() {
+        this.setState({
+            fadeIn: !this.state.fadeIn
+        });
     }
 
     componentDidMount() {
@@ -15,6 +27,15 @@ export default class ShowTechnology extends Component {
         this.getTechniquesFromDb();
         this.getTechnologyFromDb();
         this.getEvaluationFromDb(params.id);
+    }
+
+    componentDidUpdate() {
+
+        if (this.state.fadeIn) {
+            const element = document.getElementById("headerDetails");
+            
+        }
+        
     }
 
     getEvaluationFromDb = (id) => {
@@ -45,7 +66,7 @@ export default class ShowTechnology extends Component {
     renderErrorScreen = () => {
         return (
             <div>
-                <h1>There isn't any evaluation with that id</h1>
+                <h1 id="headerDetails">There isn't any evaluation with that id</h1>
             </div>
         );
     }
@@ -58,15 +79,15 @@ export default class ShowTechnology extends Component {
     renderEvaluationRating = () => {
         const evaluation = this.state.evaluation;
         const rate = evaluation.numericalEvaluation / 2;
-        if(!isNaN(rate)){
-        return (
-            <StarRatings
-                rating={rate}
-                starDimension="40px"
-                starSpacing="15px"
-                starRatedColor="blue"
-            />
-        );
+        if (!isNaN(rate)) {
+            return (
+                <StarRatings
+                    rating={rate}
+                    starDimension="40px"
+                    starSpacing="15px"
+                    starRatedColor="blue"
+                />
+            );
         } else {
             return (
                 <div>Calification not available</div>
@@ -78,8 +99,8 @@ export default class ShowTechnology extends Component {
         const evaluation = this.state.evaluation;
         const idVideo = evaluation.youtubeurl;
         const opts = {
-            height: '200',
-            width: '300'
+            width:"560",
+             height:"349"
         };
 
         return (
@@ -100,11 +121,9 @@ export default class ShowTechnology extends Component {
         const evaluation = this.state.evaluation;
         return (
             <form action={evaluation.githubUrl}>
-                <button
-                    type="submit"
-                    value="See Github Example">
-                    See Github Example
-                </button>
+                <Button color="secondary" size="lg" active>
+                See on GitHub
+                </Button>
             </form>
         );
     }
@@ -118,15 +137,37 @@ export default class ShowTechnology extends Component {
 
     renderEvaluationScreen = () => {
         const evaluation = this.state.evaluation;
-
+        var buttonMessage = "Learn More";
+        if(this.state.fadeIn){
+            buttonMessage = "Hide details";
+        }
         return (
             <div>
-                Evaluation of {evaluation.techniqueName} on {evaluation.technologyName}
-                {this.renderEvaluationRating()}
-                {this.renderEvaluationVideo()}
-                {this.renderEvaluationDescription()}
-                {this.renderEvaluationCodesnippet()}
-                {this.renderGithubButton()}
+                
+                <Jumbotron>
+                    <h1 className="display-3">Evaluation of {evaluation.techniqueName} on {evaluation.technologyName}</h1>
+                    <p className="lead">{this.renderEvaluationDescription()}</p>
+                    <hr className="my-2" />
+                    <p>{this.renderEvaluationRating()}</p>
+                    <p className="lead">
+                        <Button
+                            color="primary"
+                            onClick={this.toggle}>{buttonMessage}</Button>
+                    </p>
+                    
+                </Jumbotron>
+                <Container>{this.renderEvaluationCodesnippet()}</Container>
+                <Collapse isOpen={this.state.fadeIn} >
+                    <Container>
+                        <h1 id="headerDetails">Details</h1>
+                        {this.renderEvaluationVideo()}
+                        
+                        {this.renderGithubButton()}
+                    </Container>
+                </Collapse>
+                
+
+
             </div>
         );
     }

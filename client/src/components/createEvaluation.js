@@ -95,8 +95,11 @@ export default class CreateEvaluation extends Component {
   onChangeTechnique = (event) => {
     event.preventDefault();
     var target = event.target.value;
+    console.log(target)
     var id = parseInt(target);
+    console.log("technique",id);
     var tech = this.state.techniques[id];
+    console.log("technique",tech);
     this.setState({ technique: tech });
   }
 
@@ -120,9 +123,8 @@ export default class CreateEvaluation extends Component {
   }
 
   validateUrl = (e) => {
-    const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
     const { validate } = this.state
-    if (urlRex.test(e.target.value)) {
+    if (e.target.value !== "") {
       validate.urlState = 'has-success'
       this.setState({ codesnippet: e.target.value })
     } else {

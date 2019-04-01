@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
+import { Jumbotron, ListGroupItem, ListGroupItemHeading,
+    ListGroup, Container } from 'reactstrap';
 
 export default class ShowTechnique extends Component {
 
     state = {
-        technique : undefined,
+        technique: undefined,
         evaluations: [],
-        error : true
+        error: true
     }
 
     componentDidMount() {
@@ -33,12 +35,19 @@ export default class ShowTechnique extends Component {
             .catch(err => this.setState({ error: true }));
     }
 
-    renderTechnologies = () => {
+
+
+    renderTechnologiesList = () => {
         return this.state.evaluations.map((evaluation) => {
-            const route = "../evaluation/" + evaluation.id;
-            return <li key={evaluation.id}><a href={route}>{evaluation.technologyName}</a></li>
-        }
-        );
+            const route = '../evaluation/' + evaluation.id;
+            return (
+                <ListGroupItem tag="a" href={route} action>
+                    <ListGroupItemHeading>{evaluation.technologyName}</ListGroupItemHeading>
+                    
+                </ListGroupItem>
+            );
+
+        });
     }
 
     renderErrorScreen = () => {
@@ -53,28 +62,33 @@ export default class ShowTechnique extends Component {
         const tech = this.state.technique;
         return (
             <div>
-                <h1>{tech.name}</h1>
-                <h2>{tech.type}</h2>
-                <p>{tech.description}</p>
-                Evaluations:
-                <ul>
-                    {this.renderTechnologies()}
-                </ul>
+                <Jumbotron>
+                    <h1 className="display-3">{tech.name}</h1>
+                    <p className="lead">{tech.description}</p>
+                    <hr className="my-2" />
+                    <p className="lead">{tech.type}</p>
+                </Jumbotron>
+                <Container>
+                <h3>Evaluations:</h3>
+                <ListGroup>
+                    {this.renderTechnologiesList()}
+                </ListGroup>
+                </Container>
             </div>
         );
     }
 
-  render() {
-    console.log(this.state.technique);
-    var screen = this.renderErrorScreen();
-    if(!this.state.error && this.state.technique!== undefined) {
-        screen = this.renderTechniqueScreen();
-    }
+    render() {
+        console.log(this.state.technique);
+        var screen = this.renderErrorScreen();
+        if (!this.state.error && this.state.technique !== undefined) {
+            screen = this.renderTechniqueScreen();
+        }
 
-    return (
-      <div>
-        {screen}
-      </div>
-    )
-  }
+        return (
+            <div>
+                {screen}
+            </div>
+        )
+    }
 }

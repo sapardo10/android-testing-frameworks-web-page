@@ -58,6 +58,7 @@ export default class ShowTechnology extends Component {
     renderEvaluationRating = () => {
         const evaluation = this.state.evaluation;
         const rate = evaluation.numericalEvaluation / 2;
+        if(!isNaN(rate)){
         return (
             <StarRatings
                 rating={rate}
@@ -66,6 +67,11 @@ export default class ShowTechnology extends Component {
                 starRatedColor="blue"
             />
         );
+        } else {
+            return (
+                <div>Calification not available</div>
+            );
+        }
     }
 
     renderEvaluationVideo = () => {

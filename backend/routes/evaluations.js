@@ -64,6 +64,8 @@ router.post("/create", (req, res) => {
     let evaluation = new Evaluation();
 
     const { id,
+        technologyId,
+        techniqueId,
         technologyName,
         techniqueName,
         codesnippet,
@@ -88,6 +90,8 @@ router.post("/create", (req, res) => {
     }
 
     evaluation.id = id;
+    evaluation.technologyId = technologyId;
+    evaluation.techniqueId = techniqueId;
     evaluation.technologyName = technologyName;
     evaluation.techniqueName = techniqueName;
     evaluation.codesnippet = codesnippet;

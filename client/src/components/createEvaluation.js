@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import axios from "axios";
+import {
+  Container, Col, Form, Button,
+  FormGroup, Label, Input, FormText, FormFeedback,
+} from 'reactstrap';
+import '../App.css';
 
 export default class CreateEvaluation extends Component {
 
@@ -7,13 +12,23 @@ export default class CreateEvaluation extends Component {
     techniques: [],
     technologies: [],
     id: undefined,
+    technologyId: undefined,
+    techniqueId: undefined,
     technique: undefined,
     technology: undefined,
     codesnippet: undefined,
     youtubeurl: undefined,
     textEvaluation: undefined,
     numericalEvaluation: undefined,
-    githubUrl: undefined
+    githubUrl: undefined,
+    validate: {
+      emailState: '',
+      urlState: '',
+      youtubeState: '',
+      evaluationState:'',
+      numericalState:'',
+      githubUrlState:'',
+    },
   }
   componentDidMount() {
     this.getTechniquesFromDb();
@@ -38,8 +53,10 @@ export default class CreateEvaluation extends Component {
 
     axios.post("http://localhost:3001/evaluations/create", {
       id: this.state.id,
-      technologyName: this.state.technology,
-      techniqueName: this.state.technique,
+      technologyId: this.state.technology.id,
+      techniqueId: this.state.technique.id,
+      technologyName: this.state.technology.name,
+      techniqueName: this.state.technique.name,
       codesnippet: this.state.codesnippet,
       youtubeurl: this.state.youtubeurl,
       textEvaluation: this.state.textEvaluation,
@@ -63,98 +80,243 @@ export default class CreateEvaluation extends Component {
     return this.state.techniques.map((technique) => {
       return <option
         key={technique.name}
-        value={technique.name}>{technique.name}</option>
+        value={technique.id}>{technique.name}</option>
     });
   }
 
   renderTechnologiesOptions = () => {
     return this.state.technologies.map((technology) => {
-      return <option
+      return <option 
         key={technology.name}
-        value={technology.name}>{technology.name}</option>
+        value={technology.id}>{technology.name}</option >
     });
   }
 
+  onChangeTechnique = (event) => {
+    event.preventDefault();
+    var target = event.target.value;
+    var id = parseInt(target);
+    var tech = this.state.techniques[id];
+    this.setState({ technique: tech });
+  }
 
+  onChangeTechnology = (event) => {
+    event.preventDefault();
+    var target = event.target.value;
+    var id = parseInt(target);
+    var tech = this.state.technologies[id];
+    this.setState({ technology: tech });
+  }
+
+  validateEmail = (e) => {
+    const { validate } = this.state
+    if (e.target.value !== "") {
+      validate.emailState = 'has-success'
+      this.setState({ id: e.target.value })
+    } else {
+      validate.emailState = 'has-danger'
+    }
+    this.setState({ validate })
+  }
+
+  validateUrl = (e) => {
+    const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+    const { validate } = this.state
+    if (urlRex.test(e.target.value)) {
+      validate.urlState = 'has-success'
+      this.setState({ codesnippet: e.target.value })
+    } else {
+      validate.urlState = 'has-danger'
+    }
+    this.setState({ validate })
+  }
+  validateGithubUrl = (e) => {
+    const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+    const { validate } = this.state
+    if (urlRex.test(e.target.value)) {
+      validate.githubUrlState = 'has-success'
+      this.setState({ githubUrl: e.target.value })
+    } else {
+      validate.githubUrlState = 'has-danger'
+    }
+    this.setState({ validate })
+  }
+
+  validateYoutube = (e) => {
+    const { validate } = this.state
+    if (e.target.value !== "") {
+      validate.youtubeState = 'has-success'
+      this.setState({ youtubeurl: e.target.value })
+    } else {
+      validate.youtubeState = 'has-danger'
+    }
+    this.setState({ validate })
+  }
+
+  validateEvaluation = (e) => {
+    const { validate } = this.state
+    if (e.target.value !== "") {
+      validate.evaluationState = 'has-success'
+      this.setState({ textEvaluation: e.target.value })
+    } else {
+      validate.evaluationState = 'has-danger'
+    }
+    this.setState({ validate })
+  }
+
+  validateRating = (e) => {
+    const { validate } = this.state
+    if (e.target.value >= 0 && e.target.value <=10 && e.target.value !== "") {
+      validate.numericalState = 'has-success'
+      this.setState({ numericalEvaluation: e.target.value })
+    } else {
+      validate.numericalState = 'has-danger'
+    }
+    this.setState({ validate })
+  }
 
   render() {
+    var message = <h1>Create evaluation</h1>;
+    if(this.state.technique!== undefined && this.state.technology!==undefined){
+      message = <h1>Evaluate {this.state.technology.name} doing {this.state.technique.name}</h1>
+    }
     return (
-      <div>
-        Compare {this.state.technology} doing {this.state.technique}
-        <h2>Techniques</h2>
-        <select
-          onChange={e => this.setState({ technique: e.target.value })}>
-          <option disabled selected>Select one</option>
-          {this.renderTechniquesOptions()}
-        </select>
-        <br />
-        <h2>Technologies</h2>
-        <select
-          onChange={e => this.setState({ technology: e.target.value })}>
-          <option disabled selected >Select one</option>
-          {this.renderTechnologiesOptions()}
-        </select>
+      <Container>
+        <h1>{message}</h1>
+        <Container className="create-form">
+        <Form >
+          <Col>
+          <FormGroup>
+            <Label>Techniques</Label>
+            <Input 
+              type="select"
+              onChange={this.onChangeTechnique}>
+              <option disabled selected>Select one</option>
+              {this.renderTechniquesOptions()}
+            </Input>
+          </FormGroup>
+          <FormGroup>
+            <Label>Technologies</Label>
+            <Input 
+              type="select"
+              onChange={this.onChangeTechnology}>
+              <option  disabled selected >Select one</option >
+              {this.renderTechnologiesOptions()}
+            </Input >
+          </FormGroup>
+          </Col>
+          <Col>
+            <FormGroup >
+              <Label>Id</Label>
+              <Input
+                required
+                type="number"
+                onChange={this.validateEmail}
+                placeholder="id"
+                valid={this.state.validate.emailState === 'has-success'}
+                invalid={this.state.validate.emailState === 'has-danger'}
+              />
+              <FormText>Id to identify the evaluation</FormText>
+              <FormFeedback valid>
+                Valid id!
+              </FormFeedback>
+              <FormFeedback invalid>
+                Please provide a valid numerical id
+              </FormFeedback>
+            </FormGroup >
+          </Col>
+          <Col>
+            <FormGroup>
+              <Label>Code snippet</Label>
+              <Input
+                type="text"
+                name="codesnippet"
+                onChange={this.validateUrl}
+                placeholder="codesnippet"
+                valid={this.state.validate.urlState === 'has-success'}
+                invalid={this.state.validate.urlState === 'has-danger'}
+              />              
+              <FormText>Gist from github please!</FormText>
+              <FormFeedback invalid>
+                Invalid url
+              </FormFeedback>
+            </FormGroup>
+          </Col>
 
-        <div style={{ padding: "10px" }}>
-          <input
-          required
-            type="text"
-            style={{ width: "200px" }}
-            onChange={e => this.setState({ id: e.target.value })}
-            placeholder="id"
-          />
-        </div>
+          <Col>
+            <FormGroup>
+              <Label>Youtube Url</Label>
+              <Input
+                type="text"
+                onChange={this.validateYoutube}
+                placeholder="youtubeurl"
+                valid={this.state.validate.youtubeState === 'has-success'}
+                invalid={this.state.validate.youtubeState === 'has-danger'}
+              />
+              <FormFeedback invalid>
+                Invalid id from youtube
+              </FormFeedback>
+            </FormGroup>
+          </Col>
 
-        <div style={{ padding: "10px" }}>
-          <input
-            type="text"
-            style={{ width: "200px" }}
-            onChange={e => this.setState({ codesnippet: e.target.value })}
-            placeholder="codesnippet"
-          />
-        </div>
+          <Col>
+            <FormGroup>
+              <Label>Evaluation</Label>
+              <Input
+                type="textarea"
+                onChange={this.validateEvaluation}
+                valid={this.state.validate.evaluationState === 'has-success'}
+                invalid={this.state.validate.evaluationState === 'has-danger'}
+                            
+              />
+            </FormGroup>
+          </Col>
 
-        <div style={{ padding: "10px" }}>
-          <input
-            type="text"
-            style={{ width: "200px" }}
-            onChange={e => this.setState({ youtubeurl: e.target.value })}
-            placeholder="youtubeurl"
-          />
-        </div>
+          <Col>
+            <FormGroup>
+              <Label>Numerical Evaluation</Label>
+              <Input
+                type="number"
+                onChange={this.validateRating}
+                placeholder="numerical evaluation"
+                valid={this.state.validate.numericalState === 'has-success'}
+                invalid={this.state.validate.numericalState === 'has-danger'}
+              />
+              <FormText>Rate the suitability from 1 to 10</FormText>
+              <FormFeedback valid>
+                Valid rating!
+              </FormFeedback>
+              <FormFeedback invalid>
+                Please provide a valid numerical rating
+              </FormFeedback>
+            </FormGroup>
+          </Col>
 
-        <div style={{ padding: "10px" }}>
-          <input
-            type="text"
-            style={{ width: "200px" }}
-            onChange={e => this.setState({ textEvaluation: e.target.value })}
-            placeholder="evaluation"
-          />
-        </div>
-
-        <div style={{ padding: "10px" }}>
-          <input
-            type="number"
-            style={{ width: "200px" }}
-            onChange={e => this.setState({ numericalEvaluation: e.target.value })}
-            placeholder="numerical evaluation"
-          />
-        </div>
-
-        <div style={{ padding: "10px" }}>
-          <input
-            type="text"
-            style={{ width: "200px" }}
-            onChange={e => this.setState({ githubUrl: e.target.value })}
-            placeholder="github url"
-          />
-        </div>
-
-        <button onClick={() => this.addEvaluation()}>
-          Add evaluation
-          </button>
-
-      </div>
+          <Col>
+            <FormGroup>
+              <Label>Github url</Label>
+              <Input
+                type="text"
+                onChange={this.validateGithubUrl}
+                placeholder="github url"
+                valid={this.state.validate.githubUrlState === 'has-success'}
+                invalid={this.state.validate.githubUrlState === 'has-danger'}
+              
+              />
+              <FormText>Link to github repository</FormText>
+              <FormFeedback invalid>
+                Invalid url
+              </FormFeedback>
+            </FormGroup>
+          </Col>
+          <Col>
+          <Button  color="success" onClick={() => this.addEvaluation()}>
+            Add evaluation
+          </Button>
+          </Col>
+        </Form>
+        </Container>
+      </Container>
     )
   }
 }

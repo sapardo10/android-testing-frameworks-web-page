@@ -6,6 +6,8 @@ export default class EvaluationMatrix extends Component {
         technologies: [],
         techniques: [],
         evaluations: [],
+        apiResponse: 0,
+        matrix: undefined
     };
 
     componentDidMount() {
@@ -17,20 +19,60 @@ export default class EvaluationMatrix extends Component {
     getTechniquesFromDb = () => {
         fetch("http://localhost:3001/techniques/get")
             .then(data => data.json())
-            .then(res => this.setState({ techniques: res.data }));
+            .then(res => this.setState((preState) => {
+                return {
+                    techniques: res.data,
+                    apiResponse: preState.apiResponse + 1
+                };
+            }))
+            .then(() => this.asingMatrix());
     };
 
     getTechnologiesFromDb = () => {
         fetch("http://localhost:3001/technologies/get")
             .then(data => data.json())
-            .then(res => this.setState({ technologies: res.data }));
+            .then(res => this.setState((preState) => {
+                return {
+                    technologies: res.data,
+                    apiResponse: preState.apiResponse + 1
+                };
+            }))
+            .then(() => this.asingMatrix());
     };
 
     getEvaluationsFromDb = () => {
         fetch("http://localhost:3001/evaluations/get")
             .then(data => data.json())
-            .then(res => this.setState({ evaluations: res.data }));
+            .then(res => this.setState((preState) => {
+                return {
+                    evaluations: res.data,
+                    apiResponse: preState.apiResponse + 1
+                };
+            }))
+            .then(() => this.asingMatrix());
     };
+
+
+    asingMatrix = () => {
+        if (this.state.matrix === undefined && this.state.apiResponse === 3) {
+            this.setState({ matrix: this.createMatrix() });
+        }
+    }
+
+    createMatrix = () => {
+        var arr = [];
+        for (var i = 0; i < this.state.techniques.length; i++) {
+            arr[i] = [];
+            for (var j = 0; j < this.state.technologies.length; j++) {
+                arr[i][j] = undefined;
+            }
+        }
+        this.state.evaluations.map((evaluation) => {
+            return arr[evaluation.techniqueId][evaluation.technologyId] = evaluation;
+        });
+
+        return arr;
+    }
 
     renderTechniquesList = () => {
         return this.state.techniques.map((technique) => {
@@ -63,26 +105,37 @@ export default class EvaluationMatrix extends Component {
     }
 
     renderRows = () => {
-        return this.state.evaluations.map((evaluation) => {
-            return <tr>
-                {evaluation.techniqueName} - {evaluation.technologyName}
-            </tr>
+        var arr = this.state.matrix;
+        return arr.map((row)=>{
+            console.log("row",row);
+            return <tr>{row.map((cell)=>{
+                console.log("cell",cell);
+                if(cell!==undefined){
+                    console.log("entro")
+                    const route = "../evaluation/" + cell.id;
+                    return <td><a href={route}>{cell.techniqueName + "-" +cell.technologyName}</a></td>
+                } else {
+                    return <td>No data available</td>
+                }
+            })}</tr>
         });
     }
 
     render() {
-        console.log(this.state);
+        var screen = <div>Nada</div>;
+        if(this.state.matrix !== undefined){
+            screen = (<table>
+            <tbody>
+                <tr>
+                    {this.renderHeader()}
+                </tr>
+                {this.renderRows()}
+            </tbody>
+        </table>);
+        }
         return (
             <div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <th key="0" value="0"></th>
-                            {this.renderHeader()}
-                        </tr>
-                        {this.renderRows()}
-                    </tbody>
-                </table>
+                {screen}
 
                 <ul>
                     {this.renderTechniquesList()}

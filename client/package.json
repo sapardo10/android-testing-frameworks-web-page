@@ -6,8 +6,12 @@
     "axios": "^0.18.0",
     "react": "^16.5.0",
     "react-dom": "^16.5.0",
+    "react-gist": "^1.2.1",
     "react-router-dom": "^5.0.0",
-    "react-scripts": "1.1.5"
+    "react-scripts": "1.1.5",
+    "react-star-ratings": "^2.3.0",
+    "react-table": "^6.9.2",
+    "react-youtube": "^7.9.0"
   },
   "scripts": {
     "start": "react-scripts start",

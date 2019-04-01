@@ -19,11 +19,12 @@ router.get("/get", (req, res) => {
     });
 });
 
-router.get('/get/:name',(req,res) => {
-    const name = req.params.name;
-    Technology.findOne({name:name}, (err, data) => {
+router.get('/get/:id',(req,res) => {
+    const id = req.params.id;
+    Technology.findOne({id:id}, (err, data) => {
         if (err) return res.json({ success: false, error: err });
         if (data==null) return res.json({ success: true, message: 'Technology with name '+name+' not found' });
+        console.log(data);
         return res.json({success:true, data:data});
     })
 })

@@ -19,6 +19,16 @@ router.get("/get", (req, res) => {
     });
 });
 
+router.get('/get/:id',(req,res) => {
+  const id = req.params.id;
+  Technique.findOne({id:id}, (err, data) => {
+      if (err) return res.json({ success: false, error: err });
+      if (data==null) return res.json({ success: true, message: 'Evaluation with name '+id+' not found' });
+      console.log(data);
+      return res.json({success:true, data:data});
+  })
+})
+
 // this is our update method
 // this method overwrites existing data in our database
 router.post("/update", (req, res) => {

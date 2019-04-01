@@ -3,12 +3,14 @@ const Schema = mongoose.Schema;
 
 const EvaluationSchema = new Schema(
   {
-    idtechnology: String,
-    idtechnique: String,
+    id:Number,
+    technologyName: String,
+    techniqueName: String,
     codesnippet: String,
     youtubeurl: String,
-    evaluation: String,
-    numericalevaluation: Number
+    textEvaluation: String,
+    numericalevaluation: Number,
+    githubUrl: String
   },
   { timestamps: true }
 );

@@ -96,7 +96,7 @@ export default class CreateEvaluation extends Component {
     event.preventDefault();
     var target = event.target.value;
     console.log(target)
-    var id = parseInt(target);
+    var id = parseInt(target,10);
     console.log("technique",id);
     var tech = this.state.techniques[id];
     console.log("technique",tech);

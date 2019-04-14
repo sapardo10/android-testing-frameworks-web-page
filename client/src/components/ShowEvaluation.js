@@ -29,15 +29,6 @@ export default class ShowTechnology extends Component {
         this.getEvaluationFromDb(params.id);
     }
 
-    componentDidUpdate() {
-
-        if (this.state.fadeIn) {
-            const element = document.getElementById("headerDetails");
-            
-        }
-        
-    }
-
     getEvaluationFromDb = (id) => {
         fetch("http://localhost:3001/evaluations/get/" + id)
             .then(data => data.json())

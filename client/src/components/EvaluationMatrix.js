@@ -132,7 +132,11 @@ export default class EvaluationMatrix extends Component {
                     onExited={this.onExited}
                     key={technology.imageurl}
                 >
-                    <img height="200px" width="200px" src={technology.imageurl} />
+                    <img 
+                        height="200px" 
+                        width="200px" 
+                        src={technology.imageurl}
+                        alt={technology.name + " image"} />
                     <CarouselCaption
                         className="text-secondary"
                         key={technology.id}
@@ -186,7 +190,7 @@ export default class EvaluationMatrix extends Component {
                         color = "success"
                     }
                     return <td>
-                        <Card body inverse color color={color}>
+                        <Card body inverse color={color}>
                             <CardTitle>{cell.techniqueName + "-" + cell.technologyName}</CardTitle>
                             <CardText>{cell.textEvaluation.substring(0, 50) + "..."}</CardText>
                             <Button color="secondary" href={route}>

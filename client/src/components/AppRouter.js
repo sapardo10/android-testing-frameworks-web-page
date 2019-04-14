@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import CreateTechnology from './CreateTechnology';
 import CreateTechnique from "./CreateTechnique";
 import CreateEvaluation from "./CreateEvaluation";
@@ -15,10 +15,6 @@ import {
   Nav,
   NavItem,
   NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem
 } from 'reactstrap';
 
 export default class AppRouter extends React.Component {

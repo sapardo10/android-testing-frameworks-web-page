@@ -11,7 +11,7 @@ const EvaluationSchema = new Schema(
     codesnippet: String,
     youtubeurl: String,
     textEvaluation: String,
-    numericalevaluation: Number,
+    numericalEvaluation: Number,
     githubUrl: String
   },
   { timestamps: true }

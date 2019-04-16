@@ -56,17 +56,10 @@ export default class AppRouter extends React.Component {
       if (user) {
         this.setState({ user });
         localStorage.setItem('user', user.uid);
-        this.setState({
-          message: "You have succesfully logged in out!",
-          visible: true,
-        });
       } else {
         this.setState({ user: null });
         localStorage.removeItem('user');
-        this.setState({
-          message: "You are logged out! Log in to support this project!",
-          visible: true,
-        });
+        
       }
     });
   }
@@ -74,6 +67,10 @@ export default class AppRouter extends React.Component {
   signout = () => {
     console.log("logout");
     fire.auth().signOut();
+    this.setState({
+      message: "You are logged out! Log in to support this project!",
+      visible: true,
+    });
   }
 
   render() {

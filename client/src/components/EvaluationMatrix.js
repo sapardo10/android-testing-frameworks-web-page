@@ -151,7 +151,7 @@ export default class EvaluationMatrix extends Component {
         return this.state.techniques.map((technique) => {
             const route = './technique/' + technique.id;
             return (
-                <ListGroupItem tag="a" href={route} action>
+                <ListGroupItem key = {technique.name} tag="a" href={route} action>
                     <ListGroupItemHeading>{technique.name}</ListGroupItemHeading>
                     <ListGroupItemText>
                         {technique.description.substring(0, 32)}</ListGroupItemText>
@@ -171,12 +171,9 @@ export default class EvaluationMatrix extends Component {
 
     renderRows = () => {
         var arr = this.state.matrix;
-        return arr.map((row) => {
-            console.log("row", row);
-            return <tr>{row.map((cell) => {
-                console.log("cell", cell);
+        return arr.map((row,j) => {
+            return <tr key={j}>{row.map((cell,i) => {
                 if (cell !== undefined) {
-                    console.log("entro")
                     const route = "../evaluation/" + cell.id;
                     var color = '#333';
                     const rate = cell.numericalEvaluation;
@@ -189,7 +186,7 @@ export default class EvaluationMatrix extends Component {
                     } else if (rate > 8 && cell.numericalEvaluation <= 10) {
                         color = "success"
                     }
-                    return <td>
+                    return <td key ={cell.techniqueName + "-" + cell.technologyName}>
                         <Card body inverse color={color}>
                             <CardTitle>{cell.techniqueName + "-" + cell.technologyName}</CardTitle>
                             <CardText>{cell.textEvaluation.substring(0, 50) + "..."}</CardText>
@@ -199,7 +196,7 @@ export default class EvaluationMatrix extends Component {
                         </Card>
                     </td>
                 } else {
-                    return <td>No data available</td>
+                    return <td key={i}>No data available</td>
                 }
             })}</tr>
         });

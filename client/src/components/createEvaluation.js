@@ -106,7 +106,7 @@ export default class CreateEvaluation extends Component {
   onChangeTechnology = (event) => {
     event.preventDefault();
     var target = event.target.value;
-    var id = parseInt(target);
+    var id = parseInt(target,10);
     var tech = this.state.technologies[id];
     this.setState({ technology: tech });
   }

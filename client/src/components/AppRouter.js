@@ -7,6 +7,9 @@ import ShowTechnology from "./ShowTechnology";
 import ShowEvaluation from "./ShowEvaluation";
 import App from '../App';
 import ShowTechnique from "./ShowTechnique";
+import Login from "./Login";
+import fire from "../config/Fire";
+
 import {
   Collapse,
   Navbar,
@@ -15,6 +18,8 @@ import {
   Nav,
   NavItem,
   NavLink,
+  Button,
+  Alert
 } from 'reactstrap';
 
 export default class AppRouter extends React.Component {
@@ -22,49 +27,117 @@ export default class AppRouter extends React.Component {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.onDismiss = this.onDismiss.bind(this);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      user: {},
+      visible: false,
+      message: "",
     };
   }
+
+  onDismiss() {
+    this.setState({ visible: false });
+  }
+
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen
     });
   }
-  render() {
-    return (
-      <Router>
-        <div>
-          <Navbar color="light" light expand="md">
-            <NavbarBrand href="/">Android testing</NavbarBrand>
-            <NavbarToggler onClick={this.toggle} />
-            <Collapse isOpen={this.state.isOpen} navbar>
-              <Nav className="ml-auto" navbar>
-                <NavItem>
-                  <NavLink href="/">Home</NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink href="/create-evaluation">Create evaluation</NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink href="/create-technology">Create technology</NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink href="/create-technique">Create technique</NavLink>
-                </NavItem>
-              </Nav>
-            </Collapse>
-          </Navbar>
 
-          <Route path="/" exact component={App} />
-          <Route path="/create-evaluation/" component={CreateEvaluation} />
-          <Route path="/create-technology/" component={CreateTechnology} />
-          <Route path="/create-technique/" component={CreateTechnique} />
-          <Route path="/technology/:id" component={ShowTechnology} />
-          <Route path="/evaluation/:id" component={ShowEvaluation} />
-          <Route path="/technique/:id" component={ShowTechnique} />
-        </div>
-      </Router>
+  componentDidMount() {
+    this.authListener();
+  }
+
+  authListener() {
+    fire.auth().onAuthStateChanged((user) => {
+      console.log(user)
+      if (user) {
+        this.setState({ user });
+        localStorage.setItem('user', user.uid);
+        this.setState({
+          message: "You have succesfully logged in out!",
+          visible: true,
+        });
+      } else {
+        this.setState({ user: null });
+        localStorage.removeItem('user');
+        this.setState({
+          message: "You are logged out! Log in to support this project!",
+          visible: true,
+        });
+      }
+    });
+  }
+
+  signout = () => {
+    console.log("logout");
+    fire.auth().signOut();
+  }
+
+  render() {
+    var items = undefined;
+    if (this.state.user) {
+      items = (
+        <Collapse isOpen={this.state.isOpen} navbar>
+          <Nav className="ml-auto" navbar>
+            <NavItem>
+              <NavLink href="/">Home</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="/create-evaluation">Create evaluation</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="/create-technology">Create technology</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="/create-technique">Create technique</NavLink>
+            </NavItem>
+            <NavItem><Button onClick={this.signout}>Logout</Button>
+            </NavItem>
+          </Nav>
+        </Collapse>
+      );
+    } else {
+      items = (
+        <Collapse isOpen={this.state.isOpen} navbar>
+          <Nav className="ml-auto" navbar>
+            <NavItem>
+              <NavLink href="/">Home</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="/login">Login / Register</NavLink>
+            </NavItem>
+          </Nav>
+        </Collapse>
+      );
+    }
+    return (
+      <div>
+        <Router>
+
+          <div>
+            <Navbar color="light" light expand="md">
+              <NavbarBrand href="/">Android testing</NavbarBrand>
+              <NavbarToggler onClick={this.toggle} />
+              {items}
+            </Navbar>
+            <Alert color="success" isOpen={this.state.visible} toggle={this.onDismiss}>
+              {this.state.message}
+            </Alert>
+
+            <Route path="/" exact component={App} />
+            <Route path="/create-evaluation/" component={CreateEvaluation} />
+            <Route path="/create-technology/" component={CreateTechnology} />
+            <Route path="/create-technique/" component={CreateTechnique} />
+            <Route path="/technology/:id" component={ShowTechnology} />
+            <Route path="/evaluation/:id" component={ShowEvaluation} />
+            <Route path="/technique/:id" component={ShowTechnique} />
+            <Route path="/login" component={Login} />
+          </div>
+        </Router>
+      </div>
     );
   }
 }

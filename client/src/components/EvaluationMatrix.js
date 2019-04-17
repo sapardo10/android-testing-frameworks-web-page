@@ -175,21 +175,23 @@ export default class EvaluationMatrix extends Component {
             return <tr key={j}>{row.map((cell,i) => {
                 if (cell !== undefined) {
                     const route = "../evaluation/" + cell.id;
+                    const submission = cell.submissions[0];
+                    console.log(submission);
                     var color = '#333';
-                    const rate = cell.numericalEvaluation;
-                    if (rate > 0 && cell.numericalEvaluation <= 3) {
+                    const rate = submission.numericalEvaluation;
+                    if (rate > 0 && submission.numericalEvaluation <= 3) {
                         color = "danger"
-                    } else if (rate > 3 && cell.numericalEvaluation <= 6) {
+                    } else if (rate > 3 && submission.numericalEvaluation <= 6) {
                         color = "warning"
-                    } else if (rate > 6 && cell.numericalEvaluation <= 8) {
+                    } else if (rate > 6 && submission.numericalEvaluation <= 8) {
                         color = "info"
-                    } else if (rate > 8 && cell.numericalEvaluation <= 10) {
+                    } else if (rate > 8 && submission.numericalEvaluation <= 10) {
                         color = "success"
                     }
                     return <td key ={cell.techniqueName + "-" + cell.technologyName}>
                         <Card body inverse color={color}>
                             <CardTitle>{cell.techniqueName + "-" + cell.technologyName}</CardTitle>
-                            <CardText>{cell.textEvaluation.substring(0, 50) + "..."}</CardText>
+                            <CardText>{submission.textEvaluation.substring(0, 50) + "..."}</CardText> 
                             <Button color="secondary" href={route}>
                                 See details
                             </Button>

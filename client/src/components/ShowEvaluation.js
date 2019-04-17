@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import Gist from 'react-gist';
 import YouTube from 'react-youtube';
 import StarRatings from 'react-star-ratings';
-import { Jumbotron, Button, Container, Collapse } from 'reactstrap';
+import {
+    Jumbotron, Button, Container,
+    Collapse, ListGroupItem, ListGroupItemHeading,
+    ListGroup
+} from 'reactstrap';
 import { Redirect } from 'react-router-dom';
 
 export default class ShowTechnology extends Component {
@@ -14,6 +18,7 @@ export default class ShowTechnology extends Component {
             error: false,
             fadeIn: false,
             redirect: false,
+            submission: undefined,
         };
         this.toggle = this.toggle.bind(this);
     }
@@ -47,8 +52,29 @@ export default class ShowTechnology extends Component {
     getEvaluationFromDb = (id) => {
         fetch("http://localhost:3001/evaluations/get/" + id)
             .then(data => data.json())
-            .then(res => this.setState({ evaluation: res.data, error: false }))
+            .then((res) => this.renderEvaluation(res))
             .catch(err => this.setState({ error: true }));
+    }
+
+    renderEvaluation = (res) => {
+        const evaluation = res.data;
+        const { match: { params } } = this.props;
+        var submi = evaluation.submissions[0];
+        const idsubmission = params.idsubmission;
+        console.log(idsubmission)
+        if (idsubmission) {
+            submi = evaluation.submissions.find((sub) => {
+                console.log(sub._id,idsubmission)
+                return sub._id === idsubmission;
+            });
+        }
+        console.log(submi)
+        
+        this.setState({
+            evaluation: res.data,
+            error: false,
+            submission: submi
+        })
     }
 
     getTechniquesFromDb = () => {
@@ -83,8 +109,8 @@ export default class ShowTechnology extends Component {
     }
 
     renderEvaluationRating = () => {
-        const evaluation = this.state.evaluation;
-        const rate = evaluation.numericalEvaluation / 2;
+        const submission = this.state.submission;
+        const rate = submission.numericalEvaluation / 2;
         if (!isNaN(rate)) {
             return (
                 <StarRatings
@@ -102,8 +128,8 @@ export default class ShowTechnology extends Component {
     }
 
     renderEvaluationVideo = () => {
-        const evaluation = this.state.evaluation;
-        const idVideo = evaluation.youtubeurl;
+        const submission = this.state.submission;
+        const idVideo = submission.youtubeurl;
         const opts = {
             width: "560",
             height: "349"
@@ -119,14 +145,14 @@ export default class ShowTechnology extends Component {
     }
 
     renderEvaluationDescription = () => {
-        const evaluation = this.state.evaluation;
-        return (<p className="lead">{evaluation.textEvaluation}</p>);
+        const submission = this.state.submission;
+        return (<p className="lead">{submission.textEvaluation}</p>);
     }
 
     renderGithubButton = () => {
-        const evaluation = this.state.evaluation;
+        const submission = this.state.submission;
         return (
-            <form action={evaluation.githubUrl}>
+            <form action={submission.githubUrl}>
                 <Button color="secondary" size="lg" active>
                     See on GitHub
                 </Button>
@@ -135,9 +161,9 @@ export default class ShowTechnology extends Component {
     }
 
     renderEvaluationCodesnippet = () => {
-        const evaluation = this.state.evaluation;
+        const submission = this.state.submission;
         return (
-            <Gist id={evaluation.codesnippet} />
+            <Gist id={submission.codesnippet} />
         );
     }
 
@@ -181,15 +207,40 @@ export default class ShowTechnology extends Component {
         );
     }
 
+    renderSubmissionsList = () => {
+        return this.state.evaluation.submissions.map((submi, i) => {
+            const route = '/evaluation/' + this.state.evaluation.id + '/' + submi._id;
+            return (
+                
+                <ListGroupItem tag="a" href={route} action key={submi._id}>
+                    <ListGroupItemHeading>{i + ' - ' + submi._id + ' - ' + submi.rating}</ListGroupItemHeading>
+
+                </ListGroupItem>
+            );
+
+        });
+    }
+
     render() {
         var screen = this.renderErrorScreen();
+        var submissions = (<div></div>);
         if (!this.state.error && this.state.evaluation !== undefined) {
             screen = this.renderEvaluationScreen();
+            submissions = (
+                <div>
+                    <Container>
+                    <h3>Other submissions:</h3>
+                    <ListGroup>
+                        {this.renderSubmissionsList()}
+                    </ListGroup>
+                    </Container>
+                </div>);
         }
         return (
             <div>
                 {this.renderRedirect()}
                 {screen}
+                {submissions}
             </div>);
 
     }

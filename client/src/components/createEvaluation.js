@@ -82,18 +82,13 @@ export default class CreateEvaluation extends Component {
 
   addNewEvaluation = () => {
     const {evaluation} = this.state;
-    axios.post("http://localhost:3001/evaluations/create-new", {
-      
+    axios.post("http://localhost:3001/evaluations/create-new", {      
       id: evaluation.id,
-      technologyId: evaluation.technologyId,
-      techniqueId: evaluation.techniqueId,
-      technologyName: evaluation.technologyName,
-      techniqueName: evaluation.techniqueName,
       codesnippet: this.state.codesnippet,
       youtubeurl: this.state.youtubeurl,
       textEvaluation: this.state.textEvaluation,
       numericalEvaluation: this.state.numericalEvaluation,
-      githubUrl: this.state.githubUrl
+      githubUrl: this.state.githubUrl,
     });
   };
 

@@ -129,7 +129,7 @@ export default class AppRouter extends React.Component {
             <Route path="/create-technology/" component={CreateTechnology} />
             <Route path="/create-technique/" component={CreateTechnique} />
             <Route path="/technology/:id" component={ShowTechnology} />
-            <Route path="/evaluation/:id" component={ShowEvaluation} />
+            <Route path="/evaluation/:id/:idsubmission?" component={ShowEvaluation} />
             <Route path="/technique/:id" component={ShowTechnique} />
             <Route path="/login" component={Login} />
           </div>

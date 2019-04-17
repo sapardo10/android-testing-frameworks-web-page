@@ -5,6 +5,7 @@ import {
   FormGroup, Label, Input, FormText, FormFeedback,
 } from 'reactstrap';
 import '../App.css';
+import { Redirect } from 'react-router-dom';
 
 export default class CreateEvaluation extends Component {
 
@@ -26,29 +27,50 @@ export default class CreateEvaluation extends Component {
       emailState: '',
       urlState: '',
       youtubeState: '',
-      evaluationState:'',
-      numericalState:'',
-      githubUrlState:'',
+      evaluationState: '',
+      numericalState: '',
+      githubUrlState: '',
     },
+    visible: false,
+    message: "",
   }
+
+  onDismiss = () => {
+    this.setState({ visible: false });
+  }
+
+  setRedirect = () => {
+    this.setState({
+      redirect: true
+    })
+  }
+
+  renderRedirect = () => {
+    if (this.state.redirect) {
+      const route = '/';
+      return <Redirect to={route} />
+    }
+  }
+
+
   componentDidMount() {
-      const { match: { params } } = this.props;
-      if(params.id){
-        this.getEvaluationFromDb(params.id);
-      } else {
-        this.getTechniquesFromDb();
-        this.getTechnologiesFromDb();
-      }
-    
+    const { match: { params } } = this.props;
+    if (params.id) {
+      this.getEvaluationFromDb(params.id);
+    } else {
+      this.getTechniquesFromDb();
+      this.getTechnologiesFromDb();
+    }
+
   }
 
   getEvaluationFromDb = (id) => {
     fetch("http://localhost:3001/evaluations/get/" + id)
-        .then(data => data.json())
-        .then(res => this.setState({ evaluation: res.data, error: false }))
-        .catch(err => this.setState({ error: true }));
+      .then(data => data.json())
+      .then(res => this.setState({ evaluation: res.data, error: false }))
+      .catch(err => this.setState({ error: true }));
   }
-  
+
 
   getTechniquesFromDb = () => {
     fetch("http://localhost:3001/techniques/get")
@@ -77,19 +99,51 @@ export default class CreateEvaluation extends Component {
       textEvaluation: this.state.textEvaluation,
       numericalEvaluation: this.state.numericalEvaluation,
       githubUrl: this.state.githubUrl
+    }).then((res) => {
+      if (res.data.success === true) {
+        this.setRedirect();
+      } else {
+        this.setState({
+          message: res.data.error,
+          visible: true,
+        });
+      }
+      console.log(res);
+    }).catch((err) => {
+      console.log(err)
+      this.setState({
+        message: 'Error conecting to servers',
+        visible: true,
+      });
     });
   };
 
   addNewEvaluation = () => {
-    const {evaluation} = this.state;
-    axios.post("http://localhost:3001/evaluations/create-new", {      
+    const { evaluation } = this.state;
+    axios.post("http://localhost:3001/evaluations/create-new", {
       id: evaluation.id,
       codesnippet: this.state.codesnippet,
       youtubeurl: this.state.youtubeurl,
       textEvaluation: this.state.textEvaluation,
       numericalEvaluation: this.state.numericalEvaluation,
       githubUrl: this.state.githubUrl,
-    });
+    }).then((res) => {
+      if (res.data.success === true) {
+          this.setRedirect();
+      } else {
+          this.setState({
+              message: res.data.error,
+              visible: true,
+          });
+      }
+      console.log(res);
+  }).catch((err) => {
+      console.log(err)
+      this.setState({
+          message: 'Error conecting to servers',
+          visible: true,
+      });
+  });
   };
 
   // our update method that uses our backend api
@@ -113,7 +167,7 @@ export default class CreateEvaluation extends Component {
 
   renderTechnologiesOptions = () => {
     return this.state.technologies.map((technology) => {
-      return <option 
+      return <option
         key={technology.name}
         value={technology.id}>{technology.name}</option >
     });
@@ -123,17 +177,17 @@ export default class CreateEvaluation extends Component {
     event.preventDefault();
     var target = event.target.value;
     console.log(target)
-    var id = parseInt(target,10);
-    console.log("technique",id);
+    var id = parseInt(target, 10);
+    console.log("technique", id);
     var tech = this.state.techniques[id];
-    console.log("technique",tech);
+    console.log("technique", tech);
     this.setState({ technique: tech });
   }
 
   onChangeTechnology = (event) => {
     event.preventDefault();
     var target = event.target.value;
-    var id = parseInt(target,10);
+    var id = parseInt(target, 10);
     var tech = this.state.technologies[id];
     this.setState({ technology: tech });
   }
@@ -160,7 +214,7 @@ export default class CreateEvaluation extends Component {
     this.setState({ validate })
   }
   validateGithubUrl = (e) => {
-     // eslint-disable-next-line
+    // eslint-disable-next-line
     const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
     const { validate } = this.state
     if (urlRex.test(e.target.value)) {
@@ -196,7 +250,7 @@ export default class CreateEvaluation extends Component {
 
   validateRating = (e) => {
     const { validate } = this.state
-    if (e.target.value >= 0 && e.target.value <=10 && e.target.value !== "") {
+    if (e.target.value >= 0 && e.target.value <= 10 && e.target.value !== "") {
       validate.numericalState = 'has-success'
       this.setState({ numericalEvaluation: e.target.value })
     } else {
@@ -205,59 +259,59 @@ export default class CreateEvaluation extends Component {
     this.setState({ validate })
   }
 
-  renderTitle = () =>{
+  renderTitle = () => {
     var message = "";
     if (this.state.evaluation) {
-      message = "Create new evaluation of " +this.state.evaluation.technologyName+ " doing " +this.state.evaluation.techniqueName;
-    } else if(this.state.technique!== undefined && this.state.technology!==undefined){
-      message = "Evaluate " + this.state.technology.name +  " doing "+ this.state.technique.name;
+      message = "Create new evaluation of " + this.state.evaluation.technologyName + " doing " + this.state.evaluation.techniqueName;
+    } else if (this.state.technique !== undefined && this.state.technology !== undefined) {
+      message = "Evaluate " + this.state.technology.name + " doing " + this.state.technique.name;
     } else {
       message = "Create evaluation";
-    } 
+    }
     return message;
   }
 
   renderButton = () => {
     if (this.state.evaluation) {
       return (
-        <Button  color="success" onClick={() => this.addNewEvaluation()}>
-              Add new evaluation
+        <Button color="success" onClick={() => this.addNewEvaluation()}>
+          Add new evaluation
         </Button>
       );
     } else {
       return (
-        <Button  color="success" onClick={() => this.addEvaluation()}>
-              Add evaluation
+        <Button color="success" onClick={() => this.addEvaluation()}>
+          Add evaluation
         </Button>
       );
-    }    
+    }
   }
 
   renderForm = () => {
     if (this.state.evaluation) {
-      return 
+      return
     } else {
-      return(
+      return (
         <div>
-        <Col>
-          <FormGroup>
-            <Label>Techniques</Label>
-            <Input 
-              type="select"
-              onChange={this.onChangeTechnique}>
-              <option disabled selected>Select one</option>
-              {this.renderTechniquesOptions()}
-            </Input>
-          </FormGroup>
-          <FormGroup>
-            <Label>Technologies</Label>
-            <Input 
-              type="select"
-              onChange={this.onChangeTechnology}>
-              <option  disabled selected >Select one</option >
-              {this.renderTechnologiesOptions()}
-            </Input >
-          </FormGroup>
+          <Col>
+            <FormGroup>
+              <Label>Techniques</Label>
+              <Input
+                type="select"
+                onChange={this.onChangeTechnique}>
+                <option disabled selected>Select one</option>
+                {this.renderTechniquesOptions()}
+              </Input>
+            </FormGroup>
+            <FormGroup>
+              <Label>Technologies</Label>
+              <Input
+                type="select"
+                onChange={this.onChangeTechnology}>
+                <option disabled selected >Select one</option >
+                {this.renderTechnologiesOptions()}
+              </Input >
+            </FormGroup>
           </Col>
           <Col>
             <FormGroup >
@@ -279,107 +333,107 @@ export default class CreateEvaluation extends Component {
               </FormFeedback>
             </FormGroup >
           </Col>
-          </div>
+        </div>
       );
     }
   }
 
   render() {
-    
+
     return (
       <Container>
-      <h1>{this.renderTitle()}</h1>
+        <h1>{this.renderTitle()}</h1>
         <Container className="create-form">
-        <Form >
-          {this.renderForm()}
-          <Col>
-            <FormGroup>
-              <Label>Code snippet</Label>
-              <Input
-                type="text"
-                name="codesnippet"
-                onChange={this.validateUrl}
-                placeholder="codesnippet"
-                valid={this.state.validate.urlState === 'has-success'}
-                invalid={this.state.validate.urlState === 'has-danger'}
-              />              
-              <FormText>Gist from github please!</FormText>
-              <FormFeedback >
-                Invalid url
+          <Form >
+            {this.renderForm()}
+            <Col>
+              <FormGroup>
+                <Label>Code snippet</Label>
+                <Input
+                  type="text"
+                  name="codesnippet"
+                  onChange={this.validateUrl}
+                  placeholder="codesnippet"
+                  valid={this.state.validate.urlState === 'has-success'}
+                  invalid={this.state.validate.urlState === 'has-danger'}
+                />
+                <FormText>Gist from github please!</FormText>
+                <FormFeedback >
+                  Invalid url
               </FormFeedback>
-            </FormGroup>
-          </Col>
+              </FormGroup>
+            </Col>
 
-          <Col>
-            <FormGroup>
-              <Label>Youtube Url</Label>
-              <Input
-                type="text"
-                onChange={this.validateYoutube}
-                placeholder="youtubeurl"
-                valid={this.state.validate.youtubeState === 'has-success'}
-                invalid={this.state.validate.youtubeState === 'has-danger'}
-              />
-              <FormFeedback >
-                Invalid id from youtube
+            <Col>
+              <FormGroup>
+                <Label>Youtube Url</Label>
+                <Input
+                  type="text"
+                  onChange={this.validateYoutube}
+                  placeholder="youtubeurl"
+                  valid={this.state.validate.youtubeState === 'has-success'}
+                  invalid={this.state.validate.youtubeState === 'has-danger'}
+                />
+                <FormFeedback >
+                  Invalid id from youtube
               </FormFeedback>
-            </FormGroup>
-          </Col>
+              </FormGroup>
+            </Col>
 
-          <Col>
-            <FormGroup>
-              <Label>Evaluation</Label>
-              <Input
-                type="textarea"
-                onChange={this.validateEvaluation}
-                valid={this.state.validate.evaluationState === 'has-success'}
-                invalid={this.state.validate.evaluationState === 'has-danger'}
-                            
-              />
-            </FormGroup>
-          </Col>
+            <Col>
+              <FormGroup>
+                <Label>Evaluation</Label>
+                <Input
+                  type="textarea"
+                  onChange={this.validateEvaluation}
+                  valid={this.state.validate.evaluationState === 'has-success'}
+                  invalid={this.state.validate.evaluationState === 'has-danger'}
 
-          <Col>
-            <FormGroup>
-              <Label>Numerical Evaluation</Label>
-              <Input
-                type="number"
-                onChange={this.validateRating}
-                placeholder="numerical evaluation"
-                valid={this.state.validate.numericalState === 'has-success'}
-                invalid={this.state.validate.numericalState === 'has-danger'}
-              />
-              <FormText>Rate the suitability from 1 to 10</FormText>
-              <FormFeedback valid>
-                Valid rating!
-              </FormFeedback>
-              <FormFeedback >
-                Please provide a valid numerical rating
-              </FormFeedback>
-            </FormGroup>
-          </Col>
+                />
+              </FormGroup>
+            </Col>
 
-          <Col>
-            <FormGroup>
-              <Label>Github url</Label>
-              <Input
-                type="text"
-                onChange={this.validateGithubUrl}
-                placeholder="github url"
-                valid={this.state.validate.githubUrlState === 'has-success'}
-                invalid={this.state.validate.githubUrlState === 'has-danger'}
-              
-              />
-              <FormText>Link to github repository</FormText>
-              <FormFeedback >
-                Invalid url
+            <Col>
+              <FormGroup>
+                <Label>Numerical Evaluation</Label>
+                <Input
+                  type="number"
+                  onChange={this.validateRating}
+                  placeholder="numerical evaluation"
+                  valid={this.state.validate.numericalState === 'has-success'}
+                  invalid={this.state.validate.numericalState === 'has-danger'}
+                />
+                <FormText>Rate the suitability from 1 to 10</FormText>
+                <FormFeedback valid>
+                  Valid rating!
               </FormFeedback>
-            </FormGroup>
-          </Col>
-          <Col>
-          {this.renderButton()}
-          </Col>
-        </Form>
+                <FormFeedback >
+                  Please provide a valid numerical rating
+              </FormFeedback>
+              </FormGroup>
+            </Col>
+
+            <Col>
+              <FormGroup>
+                <Label>Github url</Label>
+                <Input
+                  type="text"
+                  onChange={this.validateGithubUrl}
+                  placeholder="github url"
+                  valid={this.state.validate.githubUrlState === 'has-success'}
+                  invalid={this.state.validate.githubUrlState === 'has-danger'}
+
+                />
+                <FormText>Link to github repository</FormText>
+                <FormFeedback >
+                  Invalid url
+              </FormFeedback>
+              </FormGroup>
+            </Col>
+            <Col>
+              {this.renderButton()}
+            </Col>
+          </Form>
         </Container>
       </Container>
     )

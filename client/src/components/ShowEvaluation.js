@@ -152,7 +152,7 @@ export default class ShowTechnology extends Component {
     renderGithubButton = () => {
         const submission = this.state.submission;
         return (
-            <form action={submission.githubUrl}>
+            <form action={'http://'+submission.githubUrl}>
                 <Button color="secondary" size="lg" active>
                     See on GitHub
                 </Button>

@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import axios from "axios";
 import {
     Container, Col, Form, Button,
-    FormGroup, Label, Input, FormText, FormFeedback,
+    FormGroup, Label, Input,
+    FormText, FormFeedback, Alert
 } from 'reactstrap';
+import { Redirect } from 'react-router-dom';
 
 export default class CreateTechnology extends Component {
 
@@ -22,6 +24,25 @@ export default class CreateTechnology extends Component {
             urlState: '',
             imageurlState: '',
         },
+        visible: false,
+        message: "",
+    }
+
+    onDismiss = () => {
+        this.setState({ visible: false });
+    }
+
+    setRedirect = () => {
+        this.setState({
+            redirect: true
+        })
+    }
+
+    renderRedirect = () => {
+        if (this.state.redirect) {
+            const route = '/';
+            return <Redirect to={route} />
+        }
     }
 
     putDataToDB = () => {
@@ -33,6 +54,22 @@ export default class CreateTechnology extends Component {
             description: this.state.description,
             url: this.state.url,
             imageurl: this.state.imageurl
+        }).then((res) => {
+            if (res.data.success === true) {
+                this.setRedirect();
+            } else {
+                this.setState({
+                    message: res.data.error,
+                    visible: true,
+                });
+            }
+            console.log(res);
+        }).catch((err) => {
+            console.log(err)
+            this.setState({
+                message: 'Error conecting to servers',
+                visible: true,
+            });
         });
     };
 
@@ -79,7 +116,7 @@ export default class CreateTechnology extends Component {
     }
 
     validateUrl = (e) => {
-         // eslint-disable-next-line
+        // eslint-disable-next-line
         const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
         const { validate } = this.state
         if (urlRex.test(e.target.value)) {
@@ -92,7 +129,7 @@ export default class CreateTechnology extends Component {
     }
 
     validateImageUrl = (e) => {
-         // eslint-disable-next-line
+        // eslint-disable-next-line
         const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
         const { validate } = this.state
         if (urlRex.test(e.target.value)) {
@@ -111,6 +148,9 @@ export default class CreateTechnology extends Component {
         }
         return (
             <Container>
+                <Alert color="danger" isOpen={this.state.visible} toggle={this.onDismiss}>
+                    {this.state.message}
+                </Alert>
                 <h1>{message}</h1>
                 <Container className="create-form">
                     <Form >

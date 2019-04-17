@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import axios from "axios";
 import {
     Container, Col, Form, Button,
-    FormGroup, Label, Input, FormText, FormFeedback,
+    FormGroup, Label, Input,
+    FormText, FormFeedback, Alert
 } from 'reactstrap';
 import '../App.css';
+import { Redirect } from 'react-router-dom';
 
 export default class CreateTechnique extends Component {
 
@@ -13,12 +15,32 @@ export default class CreateTechnique extends Component {
         name: undefined,
         description: undefined,
         type: undefined,
+        redirect: false,        
         validate: {
             idState: '',
             nameState: '',
             descriptionState: '',
             typeState: '',
         },
+        visible: false,
+        message: "",
+    }
+
+    onDismiss = () => {
+        this.setState({ visible: false });
+    }
+
+    setRedirect = () => {
+        this.setState({
+            redirect: true
+        })
+    }
+
+    renderRedirect = () => {
+        if (this.state.redirect) {
+            const route = '/';
+            return <Redirect to={route} />
+        }
     }
 
     putDataToDB = () => {
@@ -27,7 +49,24 @@ export default class CreateTechnique extends Component {
             name: this.state.name,
             description: this.state.description,
             type: this.state.type
+        }).then((res) => {
+            if (res.data.success === true) {
+                this.setRedirect();
+            } else {
+                this.setState({
+                    message: res.data.error,
+                    visible: true,
+                });
+            }
+            console.log(res);
+        }).catch((err) => {
+            console.log(err)
+            this.setState({
+                message: 'Error conecting to servers',
+                visible: true,
+            });
         });
+
     };
 
     validateId = (e) => {
@@ -82,6 +121,10 @@ export default class CreateTechnique extends Component {
         }
         return (
             <Container>
+                {this.renderRedirect()}
+                <Alert color="danger" isOpen={this.state.visible} toggle={this.onDismiss}>
+                    {this.state.message}
+                </Alert>
                 <h1>{message}</h1>
                 <Container className="create-form">
                     <Form >
@@ -99,7 +142,7 @@ export default class CreateTechnique extends Component {
                                 <FormFeedback valid>
                                     Valid id!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback >
                                     Please provide a valid numerical id
                                 </FormFeedback>
                             </FormGroup>
@@ -118,7 +161,7 @@ export default class CreateTechnique extends Component {
                                 <FormFeedback valid>
                                     Valid name!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback >
                                     Please provide a valid name
                                 </FormFeedback>
                             </FormGroup>
@@ -137,7 +180,7 @@ export default class CreateTechnique extends Component {
                                 <FormFeedback valid>
                                     Valid description!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback >
                                     Please provide a valid description
                                 </FormFeedback>
                             </FormGroup>
@@ -156,7 +199,7 @@ export default class CreateTechnique extends Component {
                                 <FormFeedback valid>
                                     Valid type!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback >
                                     Please provide a valid type
                                 </FormFeedback>
                             </FormGroup>

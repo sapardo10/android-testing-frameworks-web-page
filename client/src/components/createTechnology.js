@@ -79,6 +79,7 @@ export default class CreateTechnology extends Component {
     }
 
     validateUrl = (e) => {
+         // eslint-disable-next-line
         const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
         const { validate } = this.state
         if (urlRex.test(e.target.value)) {
@@ -91,6 +92,7 @@ export default class CreateTechnology extends Component {
     }
 
     validateImageUrl = (e) => {
+         // eslint-disable-next-line
         const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
         const { validate } = this.state
         if (urlRex.test(e.target.value)) {

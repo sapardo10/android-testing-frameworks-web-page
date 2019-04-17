@@ -3,6 +3,7 @@ import Gist from 'react-gist';
 import YouTube from 'react-youtube';
 import StarRatings from 'react-star-ratings';
 import { Jumbotron, Button, Container, Collapse } from 'reactstrap';
+import { Redirect } from 'react-router-dom';
 
 export default class ShowTechnology extends Component {
 
@@ -11,9 +12,23 @@ export default class ShowTechnology extends Component {
         this.state = {
             evaluation: undefined,
             error: false,
-            fadeIn: false
+            fadeIn: false,
+            redirect: false,
         };
         this.toggle = this.toggle.bind(this);
+    }
+
+    setRedirect = () => {
+        this.setState({
+            redirect: true
+        })
+    }
+
+    renderRedirect = () => {
+        if (this.state.redirect) {
+            const route = '/create-new-evaluation/' + this.state.evaluation.id;
+            return <Redirect to={route} />
+        }
     }
 
     toggle() {
@@ -90,8 +105,8 @@ export default class ShowTechnology extends Component {
         const evaluation = this.state.evaluation;
         const idVideo = evaluation.youtubeurl;
         const opts = {
-            width:"560",
-             height:"349"
+            width: "560",
+            height: "349"
         };
 
         return (
@@ -105,7 +120,7 @@ export default class ShowTechnology extends Component {
 
     renderEvaluationDescription = () => {
         const evaluation = this.state.evaluation;
-        return (<p>{evaluation.textEvaluation}</p>);
+        return (<p className="lead">{evaluation.textEvaluation}</p>);
     }
 
     renderGithubButton = () => {
@@ -113,7 +128,7 @@ export default class ShowTechnology extends Component {
         return (
             <form action={evaluation.githubUrl}>
                 <Button color="secondary" size="lg" active>
-                See on GitHub
+                    See on GitHub
                 </Button>
             </form>
         );
@@ -129,34 +144,37 @@ export default class ShowTechnology extends Component {
     renderEvaluationScreen = () => {
         const evaluation = this.state.evaluation;
         var buttonMessage = "Learn More";
-        if(this.state.fadeIn){
+        if (this.state.fadeIn) {
             buttonMessage = "Hide details";
         }
         return (
             <div>
-                
+
                 <Jumbotron>
                     <h1 className="display-3">Evaluation of {evaluation.techniqueName} on {evaluation.technologyName}</h1>
-                    <p className="lead">{this.renderEvaluationDescription()}</p>
+                    {this.renderEvaluationDescription()}
                     <hr className="my-2" />
-                    <p>{this.renderEvaluationRating()}</p>
+                    {this.renderEvaluationRating()}
                     <p className="lead">
                         <Button
                             color="primary"
                             onClick={this.toggle}>{buttonMessage}</Button>
+                        <Button
+                            color="secondary"
+                            onClick={this.setRedirect}>Add new evaluation</Button>
                     </p>
-                    
+
                 </Jumbotron>
                 <Container>{this.renderEvaluationCodesnippet()}</Container>
                 <Collapse isOpen={this.state.fadeIn} >
                     <Container>
                         <h1 id="headerDetails">Details</h1>
                         {this.renderEvaluationVideo()}
-                        
+
                         {this.renderGithubButton()}
                     </Container>
                 </Collapse>
-                
+
 
 
             </div>
@@ -170,6 +188,7 @@ export default class ShowTechnology extends Component {
         }
         return (
             <div>
+                {this.renderRedirect()}
                 {screen}
             </div>);
 

@@ -52,7 +52,6 @@ export default class AppRouter extends React.Component {
 
   authListener() {
     fire.auth().onAuthStateChanged((user) => {
-      console.log(user)
       if (user) {
         this.setState({ user });
         localStorage.setItem('user', user.uid);
@@ -126,6 +125,7 @@ export default class AppRouter extends React.Component {
 
             <Route path="/" exact component={App} />
             <Route path="/create-evaluation/" component={CreateEvaluation} />
+            <Route path="/create-new-evaluation/:id" component={CreateEvaluation} />
             <Route path="/create-technology/" component={CreateTechnology} />
             <Route path="/create-technique/" component={CreateTechnique} />
             <Route path="/technology/:id" component={ShowTechnology} />

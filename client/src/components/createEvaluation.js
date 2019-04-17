@@ -21,6 +21,7 @@ export default class CreateEvaluation extends Component {
     textEvaluation: undefined,
     numericalEvaluation: undefined,
     githubUrl: undefined,
+    evaluation: undefined,
     validate: {
       emailState: '',
       urlState: '',
@@ -31,9 +32,23 @@ export default class CreateEvaluation extends Component {
     },
   }
   componentDidMount() {
-    this.getTechniquesFromDb();
-    this.getTechnologiesFromDb();
+      const { match: { params } } = this.props;
+      if(params.id){
+        this.getEvaluationFromDb(params.id);
+      } else {
+        this.getTechniquesFromDb();
+        this.getTechnologiesFromDb();
+      }
+    
   }
+
+  getEvaluationFromDb = (id) => {
+    fetch("http://localhost:3001/evaluations/get/" + id)
+        .then(data => data.json())
+        .then(res => this.setState({ evaluation: res.data, error: false }))
+        .catch(err => this.setState({ error: true }));
+  }
+  
 
   getTechniquesFromDb = () => {
     fetch("http://localhost:3001/techniques/get")
@@ -57,6 +72,23 @@ export default class CreateEvaluation extends Component {
       techniqueId: this.state.technique.id,
       technologyName: this.state.technology.name,
       techniqueName: this.state.technique.name,
+      codesnippet: this.state.codesnippet,
+      youtubeurl: this.state.youtubeurl,
+      textEvaluation: this.state.textEvaluation,
+      numericalEvaluation: this.state.numericalEvaluation,
+      githubUrl: this.state.githubUrl
+    });
+  };
+
+  addNewEvaluation = () => {
+    const {evaluation} = this.state;
+    axios.post("http://localhost:3001/evaluations/create-new", {
+      
+      id: evaluation.id,
+      technologyId: evaluation.technologyId,
+      techniqueId: evaluation.techniqueId,
+      technologyName: evaluation.technologyName,
+      techniqueName: evaluation.techniqueName,
       codesnippet: this.state.codesnippet,
       youtubeurl: this.state.youtubeurl,
       textEvaluation: this.state.textEvaluation,
@@ -133,6 +165,7 @@ export default class CreateEvaluation extends Component {
     this.setState({ validate })
   }
   validateGithubUrl = (e) => {
+     // eslint-disable-next-line
     const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
     const { validate } = this.state
     if (urlRex.test(e.target.value)) {
@@ -177,17 +210,41 @@ export default class CreateEvaluation extends Component {
     this.setState({ validate })
   }
 
-  render() {
-    var message = <h1>Create evaluation</h1>;
-    if(this.state.technique!== undefined && this.state.technology!==undefined){
-      message = <h1>Evaluate {this.state.technology.name} doing {this.state.technique.name}</h1>
-    }
-    return (
-      <Container>
-        <h1>{message}</h1>
-        <Container className="create-form">
-        <Form >
-          <Col>
+  renderTitle = () =>{
+    var message = "";
+    if (this.state.evaluation) {
+      message = "Create new evaluation of " +this.state.evaluation.technologyName+ " doing " +this.state.evaluation.techniqueName;
+    } else if(this.state.technique!== undefined && this.state.technology!==undefined){
+      message = "Evaluate " + this.state.technology.name +  " doing "+ this.state.technique.name;
+    } else {
+      message = "Create evaluation";
+    } 
+    return message;
+  }
+
+  renderButton = () => {
+    if (this.state.evaluation) {
+      return (
+        <Button  color="success" onClick={() => this.addNewEvaluation()}>
+              Add new evaluation
+        </Button>
+      );
+    } else {
+      return (
+        <Button  color="success" onClick={() => this.addEvaluation()}>
+              Add evaluation
+        </Button>
+      );
+    }    
+  }
+
+  renderForm = () => {
+    if (this.state.evaluation) {
+      return 
+    } else {
+      return(
+        <div>
+        <Col>
           <FormGroup>
             <Label>Techniques</Label>
             <Input 
@@ -222,11 +279,24 @@ export default class CreateEvaluation extends Component {
               <FormFeedback valid>
                 Valid id!
               </FormFeedback>
-              <FormFeedback invalid>
+              <FormFeedback >
                 Please provide a valid numerical id
               </FormFeedback>
             </FormGroup >
           </Col>
+          </div>
+      );
+    }
+  }
+
+  render() {
+    
+    return (
+      <Container>
+      <h1>{this.renderTitle()}</h1>
+        <Container className="create-form">
+        <Form >
+          {this.renderForm()}
           <Col>
             <FormGroup>
               <Label>Code snippet</Label>
@@ -239,7 +309,7 @@ export default class CreateEvaluation extends Component {
                 invalid={this.state.validate.urlState === 'has-danger'}
               />              
               <FormText>Gist from github please!</FormText>
-              <FormFeedback invalid>
+              <FormFeedback >
                 Invalid url
               </FormFeedback>
             </FormGroup>
@@ -255,7 +325,7 @@ export default class CreateEvaluation extends Component {
                 valid={this.state.validate.youtubeState === 'has-success'}
                 invalid={this.state.validate.youtubeState === 'has-danger'}
               />
-              <FormFeedback invalid>
+              <FormFeedback >
                 Invalid id from youtube
               </FormFeedback>
             </FormGroup>
@@ -288,7 +358,7 @@ export default class CreateEvaluation extends Component {
               <FormFeedback valid>
                 Valid rating!
               </FormFeedback>
-              <FormFeedback invalid>
+              <FormFeedback >
                 Please provide a valid numerical rating
               </FormFeedback>
             </FormGroup>
@@ -306,15 +376,13 @@ export default class CreateEvaluation extends Component {
               
               />
               <FormText>Link to github repository</FormText>
-              <FormFeedback invalid>
+              <FormFeedback >
                 Invalid url
               </FormFeedback>
             </FormGroup>
           </Col>
           <Col>
-          <Button  color="success" onClick={() => this.addEvaluation()}>
-            Add evaluation
-          </Button>
+          {this.renderButton()}
           </Col>
         </Form>
         </Container>

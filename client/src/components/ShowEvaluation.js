@@ -110,7 +110,7 @@ export default class ShowTechnology extends Component {
 
     renderEvaluationRating = () => {
         const submission = this.state.submission;
-        const rate = submission.numericalEvaluation / 2;
+        const rate = submission.rating;
         if (!isNaN(rate)) {
             return (
                 <StarRatings

@@ -8,7 +8,6 @@ import {
     ListGroup, Alert
 } from 'reactstrap';
 import { Redirect } from 'react-router-dom';
-import fire from "../config/Fire";
 import axios from "axios";
 
 export default class ShowTechnology extends Component {
@@ -24,7 +23,7 @@ export default class ShowTechnology extends Component {
             rating: undefined,
             visible: false,
             message: "",
-            alreadyRated:false,
+            alreadyRated: false,
         };
         this.toggle = this.toggle.bind(this);
     }
@@ -34,19 +33,19 @@ export default class ShowTechnology extends Component {
     }
 
     changeRating = (newRating, name) => {
-        const user =  localStorage.getItem('user');
+        const user = localStorage.getItem('user');
         axios.post("http://localhost:3001/evaluations/set-rating/", {
             id: this.state.evaluation._id,
             userId: user,
             rating: newRating,
             submissionId: this.state.submission._id,
         })
-        .catch((err) => {
-            this.setState({
-                message: 'Error conecting to servers',
-                visible: true,
+            .catch((err) => {
+                this.setState({
+                    message: 'Error conecting to servers',
+                    visible: true,
+                });
             });
-        });
         this.setState({
             alreadyRated: true,
             rating: newRating
@@ -84,7 +83,7 @@ export default class ShowTechnology extends Component {
             .then(data => data.json())
             .then((res) => this.renderEvaluation(res))
             .catch((err) => {
-                
+
                 this.setState({
                     message: 'Error conecting to servers get evaluation' + err,
                     visible: true,
@@ -92,16 +91,16 @@ export default class ShowTechnology extends Component {
             });
     }
 
-    getRatingsFromUser = (evaluationId,userId) => {
+    getRatingsFromUser = (evaluationId, userId) => {
         fetch("http://localhost:3001/evaluations/get-rating/?userId=" + userId + "&submissionId=" + evaluationId)
             .then(data => data.json())
             .then((res) => {
-                if(res.data){
-                    this.setState({alreadyRated:true})
+                if (res.data) {
+                    this.setState({ alreadyRated: true })
                 }
             })
             .catch((err) => {
-                
+
                 this.setState({
                     message: 'Error conecting to servers "get ratings"',
                     visible: true,
@@ -125,7 +124,7 @@ export default class ShowTechnology extends Component {
             error: false,
             submission: submi
         })
-        var user =  localStorage.getItem('user');
+        var user = localStorage.getItem('user');
 
         if (user) {
             this.getRatingsFromUser(submi._id, user);
@@ -135,7 +134,7 @@ export default class ShowTechnology extends Component {
                 visible: true,
             });
         }
-        
+
     }
 
     getTechniquesFromDb = () => {
@@ -182,19 +181,20 @@ export default class ShowTechnology extends Component {
     }
 
     renderEvaluationRating = () => {
-        const { submission, alreadyRated,rating  } = this.state;
+        const { submission, alreadyRated, rating } = this.state;
         const amount = submission.amountRated;
         var rate = 0;
-        if(amount !== 0){
-            rate = submission.rating/amount;
+        if (amount !== 0) {
+            rate = submission.rating / amount;
         }
-        
+        var user = localStorage.getItem('user');
+
         var ratingStars = (<div>Calification not available</div>);
 
         if (!isNaN(rate)) {
-            if(this.state.alreadyRated){
-                
-                if(rating) {
+            if (this.state.alreadyRated || !user) {
+
+                if (rating) {
                     rate = rating;
                 }
                 ratingStars = (<StarRatings
@@ -215,8 +215,8 @@ export default class ShowTechnology extends Component {
                 />
                 );
             }
-            
-        } 
+
+        }
 
         return ratingStars;
     }
@@ -267,6 +267,14 @@ export default class ShowTechnology extends Component {
         if (this.state.fadeIn) {
             buttonMessage = "Hide details";
         }
+        var buttonAddNew;
+        var user = localStorage.getItem('user');
+
+        if (user) {
+            buttonAddNew = (<Button
+                color="secondary"
+                onClick={this.setRedirect}>Add new evaluation</Button>);
+        }
 
         return (
             <div>
@@ -276,13 +284,14 @@ export default class ShowTechnology extends Component {
                     {this.renderEvaluationDescription()}
                     <hr className="my-2" />
                     {this.renderEvaluationRating()}
+                    <br />
+                    <br />
+                    <br />
                     <p className="lead">
                         <Button
                             color="primary"
                             onClick={this.toggle}>{buttonMessage}</Button>
-                        <Button
-                            color="secondary"
-                            onClick={this.setRedirect}>Add new evaluation</Button>
+                        {buttonAddNew}
                     </p>
 
                 </Jumbotron>
@@ -291,8 +300,11 @@ export default class ShowTechnology extends Component {
                     <Container>
                         <h1 id="headerDetails">Details</h1>
                         {this.renderEvaluationVideo()}
-
+                        <br />
+                        <br />
                         {this.renderGithubButton()}
+                        <br />
+                        <br />
                     </Container>
                 </Collapse>
 
@@ -307,13 +319,13 @@ export default class ShowTechnology extends Component {
             const route = '/evaluation/' + this.state.evaluation.id + '/' + submi._id;
             const amount = submi.amountRated;
             var rate = 0;
-            if(amount !== 0){
-                rate = submi.rating/amount;
+            if (amount !== 0) {
+                rate = submi.rating / amount;
             }
             return (
 
                 <ListGroupItem tag="a" href={route} action key={submi._id}>
-                    <ListGroupItemHeading>{'Sumbmission number ' + i + ' - Rating: '  + rate}</ListGroupItemHeading>
+                    <ListGroupItemHeading>{'Sumbmission number ' + i + ' - Rating: ' + rate}</ListGroupItemHeading>
 
                 </ListGroupItem>
             );
@@ -345,6 +357,9 @@ export default class ShowTechnology extends Component {
                 </Alert>
                 {screen}
                 {submissions}
+                <br />
+                <br />
+                <hr />
             </div>);
 
     }

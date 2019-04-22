@@ -54,7 +54,7 @@ export default class AppRouter extends React.Component {
     fire.auth().onAuthStateChanged((user) => {
       if (user) {
         this.setState({ user });
-        localStorage.setItem('user', user.uid);
+        localStorage.setItem('user', user.email);
       } else {
         this.setState({ user: null });
         localStorage.removeItem('user');

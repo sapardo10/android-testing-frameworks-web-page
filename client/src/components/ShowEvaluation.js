@@ -5,9 +5,11 @@ import StarRatings from 'react-star-ratings';
 import {
     Jumbotron, Button, Container,
     Collapse, ListGroupItem, ListGroupItemHeading,
-    ListGroup
+    ListGroup, Alert
 } from 'reactstrap';
 import { Redirect } from 'react-router-dom';
+import fire from "../config/Fire";
+import axios from "axios";
 
 export default class ShowTechnology extends Component {
 
@@ -19,8 +21,36 @@ export default class ShowTechnology extends Component {
             fadeIn: false,
             redirect: false,
             submission: undefined,
+            rating: undefined,
+            visible: false,
+            message: "",
+            alreadyRated:false,
         };
         this.toggle = this.toggle.bind(this);
+    }
+
+    onDismiss = () => {
+        this.setState({ visible: false });
+    }
+
+    changeRating = (newRating, name) => {
+        const user =  localStorage.getItem('user');
+        axios.post("http://localhost:3001/evaluations/set-rating/", {
+            id: this.state.evaluation._id,
+            userId: user,
+            rating: newRating,
+            submissionId: this.state.submission._id,
+        })
+        .catch((err) => {
+            this.setState({
+                message: 'Error conecting to servers',
+                visible: true,
+            });
+        });
+        this.setState({
+            alreadyRated: true,
+            rating: newRating
+        });
     }
 
     setRedirect = () => {
@@ -53,7 +83,30 @@ export default class ShowTechnology extends Component {
         fetch("http://localhost:3001/evaluations/get/" + id)
             .then(data => data.json())
             .then((res) => this.renderEvaluation(res))
-            .catch(err => this.setState({ error: true }));
+            .catch((err) => {
+                
+                this.setState({
+                    message: 'Error conecting to servers get evaluation' + err,
+                    visible: true,
+                });
+            });
+    }
+
+    getRatingsFromUser = (evaluationId,userId) => {
+        fetch("http://localhost:3001/evaluations/get-rating/?userId=" + userId + "&submissionId=" + evaluationId)
+            .then(data => data.json())
+            .then((res) => {
+                if(res.data){
+                    this.setState({alreadyRated:true})
+                }
+            })
+            .catch((err) => {
+                
+                this.setState({
+                    message: 'Error conecting to servers "get ratings"',
+                    visible: true,
+                });
+            });
     }
 
     renderEvaluation = (res) => {
@@ -61,32 +114,52 @@ export default class ShowTechnology extends Component {
         const { match: { params } } = this.props;
         var submi = evaluation.submissions[0];
         const idsubmission = params.idsubmission;
-        console.log(idsubmission)
         if (idsubmission) {
             submi = evaluation.submissions.find((sub) => {
-                console.log(sub._id,idsubmission)
                 return sub._id === idsubmission;
             });
         }
-        console.log(submi)
-        
+
         this.setState({
             evaluation: res.data,
             error: false,
             submission: submi
         })
+        var user =  localStorage.getItem('user');
+
+        if (user) {
+            this.getRatingsFromUser(submi._id, user);
+        } else {
+            this.setState({
+                message: 'It seems that you are not logged in :/',
+                visible: true,
+            });
+        }
+        
     }
 
     getTechniquesFromDb = () => {
         fetch("http://localhost:3001/techniques/get")
             .then(data => data.json())
-            .then(res => this.setState({ techniques: res.data }));
+            .then(res => this.setState({ techniques: res.data }))
+            .catch((err) => {
+                this.setState({
+                    message: 'Error conecting to servers get techniques',
+                    visible: true,
+                });
+            });
     };
 
     getTechnologyFromDb = () => {
         fetch("http://localhost:3001/technologies/get/" + this.state.name)
             .then(data => data.json())
-            .then(res => this.setState({ technology: res.data }));
+            .then(res => this.setState({ technology: res.data }))
+            .catch((err) => {
+                this.setState({
+                    message: 'Error conecting to servers get technologies',
+                    visible: true,
+                });
+            });
     }
 
     renderTechniques = () => {
@@ -109,22 +182,43 @@ export default class ShowTechnology extends Component {
     }
 
     renderEvaluationRating = () => {
-        const submission = this.state.submission;
-        const rate = submission.rating;
+        const { submission, alreadyRated,rating  } = this.state;
+        const amount = submission.amountRated;
+        var rate = 0;
+        if(amount !== 0){
+            rate = submission.rating/amount;
+        }
+        
+        var ratingStars = (<div>Calification not available</div>);
+
         if (!isNaN(rate)) {
-            return (
-                <StarRatings
+            if(this.state.alreadyRated){
+                
+                if(rating) {
+                    rate = rating;
+                }
+                ratingStars = (<StarRatings
+                    rating={rate}
+                    starDimension="40px"
+                    starSpacing="15px"
+                    starRatedColor="grey"
+                    disabled={true}
+                />
+                );
+            } else {
+                ratingStars = (<StarRatings
                     rating={rate}
                     starDimension="40px"
                     starSpacing="15px"
                     starRatedColor="blue"
+                    changeRating={this.changeRating}
                 />
-            );
-        } else {
-            return (
-                <div>Calification not available</div>
-            );
-        }
+                );
+            }
+            
+        } 
+
+        return ratingStars;
     }
 
     renderEvaluationVideo = () => {
@@ -152,7 +246,7 @@ export default class ShowTechnology extends Component {
     renderGithubButton = () => {
         const submission = this.state.submission;
         return (
-            <form action={'http://'+submission.githubUrl}>
+            <form action={'http://' + submission.githubUrl}>
                 <Button color="secondary" size="lg" active>
                     See on GitHub
                 </Button>
@@ -173,6 +267,7 @@ export default class ShowTechnology extends Component {
         if (this.state.fadeIn) {
             buttonMessage = "Hide details";
         }
+
         return (
             <div>
 
@@ -210,10 +305,15 @@ export default class ShowTechnology extends Component {
     renderSubmissionsList = () => {
         return this.state.evaluation.submissions.map((submi, i) => {
             const route = '/evaluation/' + this.state.evaluation.id + '/' + submi._id;
+            const amount = submi.amountRated;
+            var rate = 0;
+            if(amount !== 0){
+                rate = submi.rating/amount;
+            }
             return (
-                
+
                 <ListGroupItem tag="a" href={route} action key={submi._id}>
-                    <ListGroupItemHeading>{i + ' - ' + submi._id + ' - ' + submi.rating}</ListGroupItemHeading>
+                    <ListGroupItemHeading>{'Sumbmission number ' + i + ' - Rating: '  + rate}</ListGroupItemHeading>
 
                 </ListGroupItem>
             );
@@ -229,16 +329,20 @@ export default class ShowTechnology extends Component {
             submissions = (
                 <div>
                     <Container>
-                    <h3>Other submissions:</h3>
-                    <ListGroup>
-                        {this.renderSubmissionsList()}
-                    </ListGroup>
+                        <h3>Other submissions:</h3>
+                        <ListGroup>
+                            {this.renderSubmissionsList()}
+                        </ListGroup>
                     </Container>
                 </div>);
         }
+
         return (
             <div>
                 {this.renderRedirect()}
+                <Alert color="danger" isOpen={this.state.visible} toggle={this.onDismiss}>
+                    {this.state.message}
+                </Alert>
                 {screen}
                 {submissions}
             </div>);

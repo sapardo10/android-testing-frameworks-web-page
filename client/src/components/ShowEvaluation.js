@@ -186,13 +186,14 @@ export default class ShowTechnology extends Component {
         var rate = 0;
         if (amount !== 0) {
             rate = submission.rating / amount;
+            
         }
         var user = localStorage.getItem('user');
 
         var ratingStars = (<div>Calification not available</div>);
 
         if (!isNaN(rate)) {
-            if (this.state.alreadyRated || !user) {
+            if (alreadyRated || !user) {
 
                 if (rating) {
                     rate = rating;
@@ -321,6 +322,9 @@ export default class ShowTechnology extends Component {
             var rate = 0;
             if (amount !== 0) {
                 rate = submi.rating / amount;
+                rate = rate.toFixed(2)
+            } else {
+                rate = "Not rated"
             }
             return (
 

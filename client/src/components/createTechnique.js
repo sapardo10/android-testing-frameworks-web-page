@@ -15,7 +15,7 @@ export default class CreateTechnique extends Component {
         name: undefined,
         description: undefined,
         type: undefined,
-        redirect: false,        
+        redirect: false,
         validate: {
             idState: '',
             nameState: '',
@@ -42,30 +42,52 @@ export default class CreateTechnique extends Component {
             return <Redirect to={route} />
         }
     }
+    canSubmitForm = () => {
+        const {
+            idState,
+            nameState,
+            descriptionState,
+            typeState,
+        } = this.state.validate;
+
+        return (idState === 'has-success')
+            && (nameState === 'has-success')
+            && (descriptionState === 'has-success')
+            && (typeState === 'has-success');
+
+    }
 
     putDataToDB = () => {
-        axios.post("http://localhost:3001/techniques/create", {
-            id: this.state.id,
-            name: this.state.name,
-            description: this.state.description,
-            type: this.state.type
-        }).then((res) => {
-            if (res.data.success === true) {
-                this.setRedirect();
-            } else {
+
+        if (this.canSubmitForm()) {
+            axios.post("http://localhost:3001/techniques/create", {
+                id: this.state.id,
+                name: this.state.name,
+                description: this.state.description,
+                type: this.state.type
+            }).then((res) => {
+                if (res.data.success === true) {
+                    this.setRedirect();
+                } else {
+                    this.setState({
+                        message: res.data.error,
+                        visible: true,
+                    });
+                }
+                console.log(res);
+            }).catch((err) => {
+                console.log(err)
                 this.setState({
-                    message: res.data.error,
+                    message: 'Error conecting to servers',
                     visible: true,
                 });
-            }
-            console.log(res);
-        }).catch((err) => {
-            console.log(err)
+            });
+        } else {
             this.setState({
-                message: 'Error conecting to servers',
+                message: "Form cannot be submitted, invalid inputs, please check the fields again.",
                 visible: true,
             });
-        });
+        }
 
     };
 

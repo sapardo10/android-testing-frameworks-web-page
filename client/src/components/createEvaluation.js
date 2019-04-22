@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import axios from "axios";
 import {
-  Container, Col, Form, Button,
-  FormGroup, Label, Input, FormText, FormFeedback,
+  Container, Col, Form,
+  Button, FormGroup, Label,
+  Input, FormText, FormFeedback,
+  Alert
 } from 'reactstrap';
 import '../App.css';
 import { Redirect } from 'react-router-dom';
@@ -24,7 +26,7 @@ export default class CreateEvaluation extends Component {
     githubUrl: undefined,
     evaluation: undefined,
     validate: {
-      emailState: '',
+      idState: '',
       urlState: '',
       youtubeState: '',
       evaluationState: '',
@@ -84,66 +86,113 @@ export default class CreateEvaluation extends Component {
       .then(res => this.setState({ technologies: res.data }));
   };
 
+  canSubmitForm = () => {
+    const {
+      idState,
+      evaluationState,
+      numericalState,
+      githubUrlState
+    } = this.state.validate;
+    const {
+      technology,
+      technique
+    } = this.state;
+
+    return (idState === 'has-success')
+      && (evaluationState === 'has-success')
+      && (numericalState === 'has-success')
+      && (githubUrlState === 'has-success' || githubUrlState === '')
+      && (technology && technique);
+
+  }
+
   // our put method that uses our backend api
   // to create new query into our data base
   addEvaluation = () => {
-
-    axios.post("http://localhost:3001/evaluations/create", {
-      id: this.state.id,
-      technologyId: this.state.technology.id,
-      techniqueId: this.state.technique.id,
-      technologyName: this.state.technology.name,
-      techniqueName: this.state.technique.name,
-      codesnippet: this.state.codesnippet,
-      youtubeurl: this.state.youtubeurl,
-      textEvaluation: this.state.textEvaluation,
-      numericalEvaluation: this.state.numericalEvaluation,
-      githubUrl: this.state.githubUrl
-    }).then((res) => {
-      if (res.data.success === true) {
-        this.setRedirect();
-      } else {
-        this.setState({
-          message: res.data.error,
-          visible: true,
-        });
-      }
-      console.log(res);
-    }).catch((err) => {
-      console.log(err)
-      this.setState({
-        message: 'Error conecting to servers',
-        visible: true,
-      });
-    });
-  };
-
-  addNewEvaluation = () => {
-    const { evaluation } = this.state;
-    axios.post("http://localhost:3001/evaluations/create-new", {
-      id: evaluation.id,
-      codesnippet: this.state.codesnippet,
-      youtubeurl: this.state.youtubeurl,
-      textEvaluation: this.state.textEvaluation,
-      numericalEvaluation: this.state.numericalEvaluation,
-      githubUrl: this.state.githubUrl,
-    }).then((res) => {
-      if (res.data.success === true) {
+    if (this.canSubmitForm()) {
+      axios.post("http://localhost:3001/evaluations/create", {
+        id: this.state.id,
+        technologyId: this.state.technology.id,
+        techniqueId: this.state.technique.id,
+        technologyName: this.state.technology.name,
+        techniqueName: this.state.technique.name,
+        codesnippet: this.state.codesnippet,
+        youtubeurl: this.state.youtubeurl,
+        textEvaluation: this.state.textEvaluation,
+        numericalEvaluation: this.state.numericalEvaluation,
+        githubUrl: this.state.githubUrl
+      }).then((res) => {
+        if (res.data.success === true) {
           this.setRedirect();
-      } else {
+        } else {
           this.setState({
-              message: res.data.error,
-              visible: true,
+            message: res.data.error,
+            visible: true,
           });
-      }
-      console.log(res);
-  }).catch((err) => {
-      console.log(err)
-      this.setState({
+        }
+        console.log(res);
+      }).catch((err) => {
+        console.log(err)
+        this.setState({
           message: 'Error conecting to servers',
           visible: true,
+        });
       });
-  });
+    } else {
+      this.setState({
+        message: "Form cannot be submitted, please check the fields again.",
+        visible: true,
+      });
+    }
+
+  };
+
+  canSubmitNewEvaluationForm = () => {
+    const {
+      evaluationState,
+      numericalState,
+      githubUrlState
+    } = this.state.validate;
+
+    return (evaluationState === 'has-success')
+      && (numericalState === 'has-success')
+      && (githubUrlState === 'has-success' || githubUrlState === '');
+
+  }
+
+  addNewEvaluation = () => {
+    if (this.canSubmitNewEvaluationForm()) {
+      const { evaluation } = this.state;
+      axios.post("http://localhost:3001/evaluations/create-new", {
+        id: evaluation.id,
+        codesnippet: this.state.codesnippet,
+        youtubeurl: this.state.youtubeurl,
+        textEvaluation: this.state.textEvaluation,
+        numericalEvaluation: this.state.numericalEvaluation,
+        githubUrl: this.state.githubUrl,
+      }).then((res) => {
+        if (res.data.success === true) {
+          this.setRedirect();
+        } else {
+          this.setState({
+            message: res.data.error,
+            visible: true,
+          });
+        }
+        console.log(res);
+      }).catch((err) => {
+        console.log(err)
+        this.setState({
+          message: 'Error conecting to servers',
+          visible: true,
+        });
+      });
+    } else {
+      this.setState({
+        message: "Form cannot be submitted, please check the fields again.",
+        visible: true,
+      });
+    }
   };
 
   // our update method that uses our backend api
@@ -192,32 +241,25 @@ export default class CreateEvaluation extends Component {
     this.setState({ technology: tech });
   }
 
-  validateEmail = (e) => {
+  validateId = (e) => {
     const { validate } = this.state
     if (e.target.value !== "") {
-      validate.emailState = 'has-success'
+      validate.idState = 'has-success'
       this.setState({ id: e.target.value })
     } else {
-      validate.emailState = 'has-danger'
+      validate.idState = 'has-danger'
     }
     this.setState({ validate })
   }
 
   validateUrl = (e) => {
-    const { validate } = this.state
-    if (e.target.value !== "") {
-      validate.urlState = 'has-success'
-      this.setState({ codesnippet: e.target.value })
-    } else {
-      validate.urlState = 'has-danger'
-    }
-    this.setState({ validate })
+    this.setState({ codesnippet: e.target.value })
   }
   validateGithubUrl = (e) => {
     // eslint-disable-next-line
     const urlRex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
     const { validate } = this.state
-    if (urlRex.test(e.target.value)) {
+    if (urlRex.test(e.target.value) || e.target.value === '') {
       validate.githubUrlState = 'has-success'
       this.setState({ githubUrl: e.target.value })
     } else {
@@ -227,14 +269,7 @@ export default class CreateEvaluation extends Component {
   }
 
   validateYoutube = (e) => {
-    const { validate } = this.state
-    if (e.target.value !== "") {
-      validate.youtubeState = 'has-success'
-      this.setState({ youtubeurl: e.target.value })
-    } else {
-      validate.youtubeState = 'has-danger'
-    }
-    this.setState({ validate })
+    this.setState({ youtubeurl: e.target.value })
   }
 
   validateEvaluation = (e) => {
@@ -250,7 +285,7 @@ export default class CreateEvaluation extends Component {
 
   validateRating = (e) => {
     const { validate } = this.state
-    if (e.target.value >= 0 && e.target.value <= 10 && e.target.value !== "") {
+    if (e.target.value >= 0 && e.target.value <= 5 && e.target.value !== "") {
       validate.numericalState = 'has-success'
       this.setState({ numericalEvaluation: e.target.value })
     } else {
@@ -319,10 +354,10 @@ export default class CreateEvaluation extends Component {
               <Input
                 required
                 type="number"
-                onChange={this.validateEmail}
+                onChange={this.validateId}
                 placeholder="id"
-                valid={this.state.validate.emailState === 'has-success'}
-                invalid={this.state.validate.emailState === 'has-danger'}
+                valid={this.state.validate.idState === 'has-success'}
+                invalid={this.state.validate.idState === 'has-danger'}
               />
               <FormText>Id to identify the evaluation</FormText>
               <FormFeedback valid>
@@ -342,6 +377,7 @@ export default class CreateEvaluation extends Component {
 
     return (
       <Container>
+
         <h1>{this.renderTitle()}</h1>
         <Container className="create-form">
           <Form >
@@ -354,13 +390,8 @@ export default class CreateEvaluation extends Component {
                   name="codesnippet"
                   onChange={this.validateUrl}
                   placeholder="codesnippet"
-                  valid={this.state.validate.urlState === 'has-success'}
-                  invalid={this.state.validate.urlState === 'has-danger'}
                 />
                 <FormText>Gist from github please!</FormText>
-                <FormFeedback >
-                  Invalid url
-              </FormFeedback>
               </FormGroup>
             </Col>
 
@@ -371,12 +402,7 @@ export default class CreateEvaluation extends Component {
                   type="text"
                   onChange={this.validateYoutube}
                   placeholder="youtubeurl"
-                  valid={this.state.validate.youtubeState === 'has-success'}
-                  invalid={this.state.validate.youtubeState === 'has-danger'}
                 />
-                <FormFeedback >
-                  Invalid id from youtube
-              </FormFeedback>
               </FormGroup>
             </Col>
 
@@ -422,7 +448,6 @@ export default class CreateEvaluation extends Component {
                   placeholder="github url"
                   valid={this.state.validate.githubUrlState === 'has-success'}
                   invalid={this.state.validate.githubUrlState === 'has-danger'}
-
                 />
                 <FormText>Link to github repository</FormText>
                 <FormFeedback >
@@ -430,6 +455,9 @@ export default class CreateEvaluation extends Component {
               </FormFeedback>
               </FormGroup>
             </Col>
+            <Alert color="danger" isOpen={this.state.visible} toggle={this.onDismiss}>
+              {this.state.message}
+            </Alert>
             <Col>
               {this.renderButton()}
             </Col>

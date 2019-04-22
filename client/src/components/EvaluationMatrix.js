@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import {
-    Table, Container, Card, CardTitle, CardText
-    , Button, Carousel,
-    CarouselItem,
-    CarouselControl,
-    CarouselIndicators,
-    CarouselCaption,
-    Jumbotron,
-    ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText
+    Table, Container, Card, 
+    CardTitle, CardText, Button,
+    Jumbotron, ListGroup, ListGroupItem, 
+    ListGroupItemHeading, ListGroupItemText
 } from 'reactstrap';
+import { Redirect } from 'react-router-dom';
 
 
 export default class EvaluationMatrix extends Component {
@@ -16,45 +13,13 @@ export default class EvaluationMatrix extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            activeIndex: 0,
             technologies: [],
             techniques: [],
             evaluations: [],
             apiResponse: 0,
             matrix: undefined
         };
-        this.next = this.next.bind(this);
-        this.previous = this.previous.bind(this);
-        this.goToIndex = this.goToIndex.bind(this);
-        this.onExiting = this.onExiting.bind(this);
-        this.onExited = this.onExited.bind(this);
     }
-
-    onExiting() {
-        this.animating = true;
-    }
-
-    onExited() {
-        this.animating = false;
-    }
-
-    next() {
-        if (this.animating) return;
-        const nextIndex = this.state.activeIndex === this.state.technologies.length - 1 ? 0 : this.state.activeIndex + 1;
-        this.setState({ activeIndex: nextIndex });
-    }
-
-    previous() {
-        if (this.animating) return;
-        const nextIndex = this.state.activeIndex === 0 ? this.state.technologies.length - 1 : this.state.activeIndex - 1;
-        this.setState({ activeIndex: nextIndex });
-    }
-
-    goToIndex(newIndex) {
-        if (this.animating) return;
-        this.setState({ activeIndex: newIndex });
-    }
-
 
 
     componentDidMount() {
@@ -121,29 +86,24 @@ export default class EvaluationMatrix extends Component {
         return arr;
     }
 
+    renderRedirect = () => {
+        console.log('redirect')
+        if (this.state.redirect) {
+            const route = '/';
+            return <Redirect to={route} />
+        }
+    }
+
     renderTechnologiesList = () => {
 
         return this.state.technologies.map((technology) => {
             const route = "./technology/" + technology.id;
             return (
-                <CarouselItem
-
-                    onExiting={this.onExiting}
-                    onExited={this.onExited}
-                    key={technology.imageurl}
-                >
-                    <img 
-                        height="200px" 
-                        width="200px" 
-                        src={technology.imageurl}
-                        alt={technology.name + " image"} />
-                    <CarouselCaption
-                        className="text-secondary"
-                        key={technology.id}
-                        captionText={technology.name}
-                        captionHeader={technology.name}
-                        href={route} />
-                </CarouselItem>);
+                <ListGroupItem key={technology.imageurl} tag="a" href={route} action>
+                    <ListGroupItemHeading>{technology.name}</ListGroupItemHeading>
+                    <ListGroupItemText>
+                        {technology.description.substring(0, 60) + "..."}</ListGroupItemText>
+                </ListGroupItem>);
         });
     }
 
@@ -154,7 +114,7 @@ export default class EvaluationMatrix extends Component {
                 <ListGroupItem key = {technique.name} tag="a" href={route} action>
                     <ListGroupItemHeading>{technique.name}</ListGroupItemHeading>
                     <ListGroupItemText>
-                        {technique.description.substring(0, 32)}</ListGroupItemText>
+                        {technique.description.substring(0, 60) + "..."}</ListGroupItemText>
                 </ListGroupItem>
             );
 
@@ -176,7 +136,6 @@ export default class EvaluationMatrix extends Component {
                 if (cell !== undefined) {
                     const route = "../evaluation/" + cell.id;
                     const submission = cell.submissions[0];
-                    console.log(submission);
                     var color = '#333';
                     const rate = submission.numericalEvaluation;
                     if (rate > 0 && submission.numericalEvaluation <= 3) {
@@ -235,17 +194,9 @@ export default class EvaluationMatrix extends Component {
                     <h1>Technologies</h1>
                     <br />
                     <br />
-                    <Carousel
-                        activeIndex={activeIndex}
-                        next={this.next}
-                        previous={this.previous}
-                    >
-                        <CarouselIndicators items={this.state.technologies} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+                    <ListGroup>
                         {this.renderTechnologiesList()}
-                        <CarouselControl direction="prev" directionText="Previous" onClickHandler={this.previous} />
-                        <CarouselControl direction="next" directionText="Next" onClickHandler={this.next} />
-                    </Carousel>
-
+                    </ListGroup>
                     <br />
                     <hr />
                     <h1>Techniques</h1>

@@ -45,9 +45,29 @@ export default class CreateTechnology extends Component {
         }
     }
 
+    canSubmitForm = () => {
+        const {
+            idState,
+            nameState,
+            creatorState,
+            descriptionState,
+            urlState,
+            imageurlState, 
+        } = this.state.validate;
+
+        return (idState === 'has-success')
+        && (nameState === 'has-success')
+        && (creatorState === 'has-success')
+        && (descriptionState === 'has-success')
+        && (urlState === 'has-success')
+        && (imageurlState === 'has-success');
+
+    }
+
     putDataToDB = () => {
-        console.log(this.state)
-        axios.post("http://localhost:3001/technologies/create", {
+        console.log("can submit",this.canSubmitForm())
+        if(this.canSubmitForm()){
+            axios.post("http://localhost:3001/technologies/create", {
             id: this.state.id,
             name: this.state.name,
             creator: this.state.creator,
@@ -71,6 +91,13 @@ export default class CreateTechnology extends Component {
                 visible: true,
             });
         });
+        } else {
+            this.setState({
+                message: "Form cannot be submitted, please check the fields again.",
+                visible: true,
+            });
+        }
+        
     };
 
     validateId = (e) => {
@@ -168,7 +195,7 @@ export default class CreateTechnology extends Component {
                                 <FormFeedback valid>
                                     Valid id!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback>
                                     Please provide a valid numerical id
                                 </FormFeedback>
                             </FormGroup>
@@ -187,7 +214,7 @@ export default class CreateTechnology extends Component {
                                 <FormFeedback valid>
                                     Valid name!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback>
                                     Please provide a valid name
                                 </FormFeedback>
                             </FormGroup>
@@ -206,7 +233,7 @@ export default class CreateTechnology extends Component {
                                 <FormFeedback valid>
                                     Valid creator!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback>
                                     Please provide a valid name of the creator
                                 </FormFeedback>
                             </FormGroup>
@@ -225,7 +252,7 @@ export default class CreateTechnology extends Component {
                                 <FormFeedback valid>
                                     Valid description!
                                 </FormFeedback>
-                                <FormFeedback invalid>
+                                <FormFeedback>
                                     Please provide a valid description
                                 </FormFeedback>
                             </FormGroup>
@@ -240,7 +267,7 @@ export default class CreateTechnology extends Component {
                                     invalid={this.state.validate.urlState === 'has-danger'}
                                 />
                                 <FormText>Link to main page of technology</FormText>
-                                <FormFeedback invalid>
+                                <FormFeedback>
                                     Invalid url
                                 </FormFeedback>
                             </FormGroup>
@@ -255,7 +282,7 @@ export default class CreateTechnology extends Component {
                                     invalid={this.state.validate.imageurlState === 'has-danger'}
                                 />
                                 <FormText>Link to image logo</FormText>
-                                <FormFeedback invalid>
+                                <FormFeedback>
                                     Invalid url
                                 </FormFeedback>
                             </FormGroup>

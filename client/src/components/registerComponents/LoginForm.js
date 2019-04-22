@@ -5,35 +5,35 @@ import {
     Input
 } from 'reactstrap';
 import fire from '../../config/Fire';
-import SweetAlert from 'sweetalert-react';
+
 
 export default class LoginForm extends Component {
+
 
     state = {
         email: "",
         password: "",
         error: "",
-        show: false,
     }
+
+
+
 
     login = (e) => {
         e.preventDefault();
-        fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then((u)=> {
+        fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then((u) => {
             console.log(u);
-        }).catch((error)=>{
+            this.props.onRedirect()
+        }).catch((error) => {
             console.log(error);
         });
     }
 
     handleEmailChange = (e) => {
-        this.setState({email:e.target.value})
+        this.setState({ email: e.target.value })
     }
     handlePasswordChange = (e) => {
-        this.setState({password:e.target.value})
-    }
-    confirmSweetAlert = () => {
-        this.setState({ show: false })
-        this.props.history.push('/')
+        this.setState({ password: e.target.value })
     }
 
     render() {
@@ -67,18 +67,12 @@ export default class LoginForm extends Component {
                             </FormGroup >
                         </Col>
                         <Col>
-                            <Button color="success" onClick={ this.login}>
+                            <Button color="success" onClick={this.login}>
                                 Log in
                             </Button>
                         </Col>
                     </Form>
                 </Container>
-                <SweetAlert
-                    show={this.state.show}
-                    title="Success"
-                    text="You have succesfully logged in"
-                    onConfirm={() => this.setState({ show: false })}
-                />
             </Col>
         )
     }

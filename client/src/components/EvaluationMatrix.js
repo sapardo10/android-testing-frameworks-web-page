@@ -254,6 +254,9 @@ export default class EvaluationMatrix extends Component {
                     <ListGroup>
                         {this.renderTechniquesList()}
                     </ListGroup>
+                    <br />
+                    <br />
+                    <hr />
 
 
                 </Container>

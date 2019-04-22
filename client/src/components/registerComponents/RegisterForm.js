@@ -29,6 +29,7 @@ export default class RegisterForm extends Component {
         && this.isValid('passwordConfirmationState')){
         fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
             console.log(u);
+            this.props.onRedirect();
         }).catch((error)=> {
             console.log(error);
         });

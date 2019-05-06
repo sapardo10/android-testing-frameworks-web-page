@@ -225,18 +225,23 @@ export default class ShowTechnology extends Component {
     renderEvaluationVideo = () => {
         const submission = this.state.submission;
         const idVideo = submission.youtubeurl;
+        
         const opts = {
             width: "560",
             height: "349"
         };
-
-        return (
-            <YouTube
-                videoId={idVideo}
-                opts={opts}
-                onReady={this._onReady}
-            />
-        );
+        if(idVideo){
+            return (
+                <YouTube
+                    videoId={idVideo}
+                    opts={opts}
+                    onReady={this._onReady}
+                />
+            );            
+        } else {
+            return (<div></div>);
+        }
+        
     }
 
     renderEvaluationDescription = () => {

@@ -98,6 +98,11 @@ export default class CreateEvaluation extends Component {
       technique
     } = this.state;
 
+    console.log((idState === 'has-success'))
+    console.log((evaluationState === 'has-success'));
+    console.log((numericalState === 'has-success'));
+    console.log((githubUrlState === 'has-success' || githubUrlState === ''));
+    console.log((technology && technique));
     return (idState === 'has-success')
       && (evaluationState === 'has-success')
       && (numericalState === 'has-success')
@@ -228,6 +233,7 @@ export default class CreateEvaluation extends Component {
     console.log(target)
     var id = parseInt(target, 10);
     console.log("technique", id);
+    console.log(this.state.techniques);
     var tech = this.state.techniques[id];
     console.log("technique", tech);
     this.setState({ technique: tech });

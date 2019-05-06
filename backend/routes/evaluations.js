@@ -142,7 +142,7 @@ router.post("/create", (req, res) => {
     submission.textEvaluation = textEvaluation;
     submission.numericalEvaluation = numericalEvaluation;
     submission.githubUrl = githubUrl;
-    submission.rating = 5;
+    submission.rating = 500;
     submission.amountRated = 100;
 
     evaluation.submissions = [submission];

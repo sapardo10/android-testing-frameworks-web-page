@@ -138,13 +138,13 @@ export default class EvaluationMatrix extends Component {
                     const submission = cell.submissions[0];
                     var color = '#333';
                     const rate = submission.numericalEvaluation;
-                    if (rate > 0 && submission.numericalEvaluation <= 3) {
+                    if (rate >= 0 && submission.numericalEvaluation <= 1) {
                         color = "danger"
-                    } else if (rate > 3 && submission.numericalEvaluation <= 6) {
+                    } else if (rate > 1 && submission.numericalEvaluation <= 3) {
                         color = "warning"
-                    } else if (rate > 6 && submission.numericalEvaluation <= 8) {
+                    } else if (rate > 3 && submission.numericalEvaluation <= 4) {
                         color = "info"
-                    } else if (rate > 8 && submission.numericalEvaluation <= 10) {
+                    } else if (rate > 4 && submission.numericalEvaluation <= 5) {
                         color = "success"
                     }
                     return <td key ={cell.techniqueName + "-" + cell.technologyName}>

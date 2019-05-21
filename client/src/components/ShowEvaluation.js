@@ -35,10 +35,10 @@ export default class ShowTechnology extends Component {
     changeRating = (newRating, name) => {
         const user = localStorage.getItem('user');
         axios.post("http://localhost:3001/evaluations/set-rating/", {
-            id: this.state.evaluation._id,
+            id: this.state.evaluation.id,
             userId: user,
             rating: newRating,
-            submissionId: this.state.submission._id,
+            submissionId: this.state.submission.id,
         })
             .catch((err) => {
                 this.setState({
@@ -331,10 +331,13 @@ export default class ShowTechnology extends Component {
             } else {
                 rate = "Not rated"
             }
+            const user = submi.userEmail;
+            const time = submi.createdAt;
+            let date = new Date(time);
+            console.log("time",date);
             return (
-
                 <ListGroupItem tag="a" href={route} action key={submi._id}>
-                    <ListGroupItemHeading>{'Sumbmission number ' + i + ' - Rating: ' + rate}</ListGroupItemHeading>
+                    <ListGroupItemHeading>{'Sumbmission made by: '+user + ' - Rating: ' + rate + ' - at: ' + date }</ListGroupItemHeading>
 
                 </ListGroupItem>
             );
@@ -343,19 +346,25 @@ export default class ShowTechnology extends Component {
     }
 
     render() {
+
         var screen = this.renderErrorScreen();
-        var submissions = (<div></div>);
+        var submissions;
         if (!this.state.error && this.state.evaluation !== undefined) {
             screen = this.renderEvaluationScreen();
-            submissions = (
-                <div>
-                    <Container>
-                        <h3>Other submissions:</h3>
-                        <ListGroup>
-                            {this.renderSubmissionsList()}
-                        </ListGroup>
-                    </Container>
-                </div>);
+            console.log("submissions",this.state.evaluation.submissions.length);
+            if(this.state.evaluation.submissions.length > 1){
+                submissions = (
+                    <div>
+                        <Container>
+                            <h3>Submissions:</h3>
+                            <ListGroup>
+                                {this.renderSubmissionsList()}
+                            </ListGroup>
+                        </Container>
+                    </div>);
+            } else {
+                submissions = (<h3>No other submissions</h3>);
+            }
         }
 
         return (

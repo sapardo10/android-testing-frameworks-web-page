@@ -4,7 +4,8 @@ const Submission = require('./submission');
 
 const EvaluationSchema = new Schema(
   {
-    id:Number,
+    id:String,
+    userId: String,
     technologyId: Number,
     techniqueId: Number,
     technologyName: String,

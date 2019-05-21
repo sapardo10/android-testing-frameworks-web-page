@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const SubmissionSchema = new Schema(
   {
-    id:Number,
+    id:String,
     technologyId: Number,
     techniqueId: Number,
     technologyName: String,
@@ -15,6 +15,8 @@ const SubmissionSchema = new Schema(
     githubUrl: String,
     rating: Number,
     amountRated: Number,
+    userId:String,
+    userEmail:String,
   },
   { timestamps: true }
 );

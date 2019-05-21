@@ -8,6 +8,7 @@ const cors = require('cors');
 const technologies = require('./routes/technologies');
 const techniques = require('./routes/techniques');
 const evaluations = require('./routes/evaluations');
+const users = require('./routes/users');
 
 const MONGO_USER = process.env.MONGO_USER;
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
@@ -37,6 +38,7 @@ app.use(cors());
 app.use('/technologies', technologies);
 app.use('/techniques', techniques);
 app.use('/evaluations', evaluations);
+app.use('/users', users);
 
 // this is our get method
 // this method fetches all available data in our database

@@ -3,6 +3,8 @@ var router = express.Router();
 const Evaluation = require("../schemas/evaluation");
 const Submission = require("../schemas/submission");
 const Rating = require("../schemas/rating");
+const User = require("../schemas/user");
+var mongoose = require('mongoose');
 
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {
@@ -104,8 +106,10 @@ router.post("/update", (req, res) => {
 router.post("/create", (req, res) => {
     let submission = new Submission();
     let evaluation = new Evaluation();
-
-    const { id,
+    console.log("new submission", req.body);
+    const {
+        userId,
+        userEmail,
         technologyId,
         techniqueId,
         technologyName,
@@ -120,9 +124,7 @@ router.post("/create", (req, res) => {
         || (!techniqueName && techniqueName !== "")
         || !textEvaluation || textEvaluation === ""
         || !numericalEvaluation
-        || Number.isInteger(numericalEvaluation)
-        || !id
-        || Number.isInteger(id)) {
+        || Number.isInteger(numericalEvaluation)) {
         console.log(req.body);
         return res.json({
 
@@ -131,12 +133,18 @@ router.post("/create", (req, res) => {
         });
     }
 
-    evaluation.id = id;
+    var myId = mongoose.Types.ObjectId();
+    evaluation.id = myId;
+    evaluation.userId = userId;
+    evaluation.userEmail = userEmail;
     evaluation.technologyId = technologyId;
     evaluation.techniqueId = techniqueId;
     evaluation.technologyName = technologyName;
     evaluation.techniqueName = techniqueName;
 
+    submission.id = myId;
+    submission.userId = userId;
+    submission.userEmail = userEmail;
     submission.codesnippet = codesnippet;
     submission.youtubeurl = youtubeurl;
     submission.textEvaluation = textEvaluation;
@@ -150,7 +158,24 @@ router.post("/create", (req, res) => {
     evaluation.save(err => {
         console.log(err || "todo bien");
         if (err) return res.json({ success: false, error: err });
-        return res.json({ success: true });
+        submission.save(err => {
+            console.log(err || "todo bien");
+            if (err) return res.json({ success: false, error: err });
+            User.findOneAndUpdate({ id: userId }, {
+                $push: {
+                    submissions: {
+                        $each: [myId,],
+                    }
+                }
+            }, err => {
+                if (err) {
+                    console.log(err)
+                    return res.json({ success: false, error: err });
+                } else {
+                    return res.json({ success: true });
+                }
+            });
+        });
     });
 });
 
@@ -164,9 +189,11 @@ router.post("/update", (req, res) => {
 
 router.post("/create-new", (req, res) => {
     let submission = new Submission();
-
+    console.log("new submission", req.body);
     const {
         id,
+        userId,
+        userEmail,
         codesnippet,
         youtubeurl,
         textEvaluation,
@@ -183,6 +210,10 @@ router.post("/create-new", (req, res) => {
         });
     }
 
+    var myId = mongoose.Types.ObjectId();
+    submission.id = myId;
+    submission.userId = userId;
+    submission.userEmail = userEmail;
     submission.codesnippet = codesnippet;
     submission.youtubeurl = youtubeurl;
     submission.textEvaluation = textEvaluation;
@@ -206,7 +237,25 @@ router.post("/create-new", (req, res) => {
             console.log(err)
             return res.json({ success: false, error: err });
         } else {
-            return res.json({ success: true });
+            submission.save(err => {
+                console.log(err || "todo bien");
+                if (err) return res.json({ success: false, error: err });
+                User.findOneAndUpdate({ id: userId }, {
+                    $push: {
+                        submissions: {
+                            $each: [myId,],
+                        }
+                    }
+                }, err => {
+                    if (err) {
+                        console.log(err)
+                        return res.json({ success: false, error: err });
+                    } else {
+                        return res.json({ success: true });
+                    }
+                });
+            });
+
         }
     });
 });
@@ -230,28 +279,59 @@ router.post("/set-rating/", (req, res) => {
         });
 
     Rating.findOneAndUpdate({ userId: userId },
-        {$addToSet: {
-            submissions: {
-                $each: [submissionId,],
-            },
-        }
+        {
+            $addToSet: {
+                submissions: {
+                    $each: [submissionId,],
+                },
+            }
         }, (err, doc) => {
+            console.log("sub id",submissionId);
             if (err) {
                 return res.json({ success: false, error: err });
-            }else if(!doc){
-                var rating = new Rating();
-                rating.userId = userId
-                rating.submissions.push(submissionId);
-                rating.save(err => {
+            } else if (!doc) {
+                var ratingObj = new Rating();
+                ratingObj.userId = userId
+                ratingObj.submissions.push(submissionId);
+                ratingObj.save(err => {
                     console.log(err || "todo bien");
                     if (err) return res.json({ success: false, error: err });
-                    return res.json({ success: true });
+                    Submission.update({ id: submissionId }, {
+                        $inc: {
+                            'rating': rating,
+                            'amountRated': 1,
+                        },
+
+                    }, err,sub => {
+                        console.log("sub",sub);
+                        if (err) {
+                            console.log(err)
+                            return res.json({ success: false, error: err });
+                        } else {
+                            return res.json({ success: true });
+                        }
+                    });
                 });
             } else {
-                return res.json({ success: false, error: "el doc es nulo" })
+                Submission.update({ id: submissionId }, {
+                    $inc: {
+                        'rating': rating,
+                        'amountRated': 1,
+                    },
+
+                }, err => {
+                    if (err) {
+                        console.log(err)
+                        return res.json({ success: false, error: err });
+                    } else {
+                        return res.json({ success: true });
+                    }
+                });
             }
         }
-        );
+    );
+
+
 
 
 

@@ -6,6 +6,7 @@ import {
   Input, FormText, FormFeedback,
   Alert
 } from 'reactstrap';
+import fire from '../config/Fire';
 import '../App.css';
 import { Redirect } from 'react-router-dom';
 
@@ -116,6 +117,8 @@ export default class CreateEvaluation extends Component {
   addEvaluation = () => {
     if (this.canSubmitForm()) {
       axios.post("http://localhost:3001/evaluations/create", {
+        userId: fire.auth().currentUser.uid,
+        userEmail: fire.auth().currentUser.email,
         id: this.state.id,
         technologyId: this.state.technology.id,
         techniqueId: this.state.technique.id,
@@ -169,6 +172,8 @@ export default class CreateEvaluation extends Component {
     if (this.canSubmitNewEvaluationForm()) {
       const { evaluation } = this.state;
       axios.post("http://localhost:3001/evaluations/create-new", {
+        userId: fire.auth().currentUser.uid,
+        userEmail: fire.auth().currentUser.email,
         id: evaluation.id,
         codesnippet: this.state.codesnippet,
         youtubeurl: this.state.youtubeurl,

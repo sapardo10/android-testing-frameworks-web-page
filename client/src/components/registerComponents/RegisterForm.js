@@ -5,6 +5,7 @@ import {
     Input, FormText, FormFeedback,
 } from 'reactstrap';
 import fire from '../../config/Fire';
+import axios from "axios";
 
 export default class RegisterForm extends Component {
 
@@ -24,16 +25,38 @@ export default class RegisterForm extends Component {
 
     signup = (e) => {
         e.preventDefault();
-        if(this.isValid('emailState')
-        && this.isValid('passwordState')
-        && this.isValid('passwordConfirmationState')){
-        fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u)=>{
-            console.log(u);
-            this.props.onRedirect();
-        }).catch((error)=> {
-            console.log(error);
-        });
-    }
+        if (this.isValid('emailState')
+            && this.isValid('passwordState')
+            && this.isValid('passwordConfirmationState')) {
+            fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u) => {
+                
+                const user = u.user;
+                axios.post("http://localhost:3001/users/create", {
+                    id: user.uid,
+                    email: user.email,
+                }).then((res) => {
+                    console.log(res.data);
+                    if (res.data.success === true) {
+                        this.setRedirect();
+                    } else {
+                        this.setState({
+                            message: res.data.error,
+                            visible: true,
+                        });
+                    }
+                    console.log(res);
+                }).catch((err) => {
+                    console.log(err)
+                    this.setState({
+                        message: 'Error conecting to servers',
+                        visible: true,
+                    });
+                });
+                this.props.onRedirect();
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
     }
 
     validateEmail = (e) => {
@@ -71,81 +94,81 @@ export default class RegisterForm extends Component {
         this.setState({ validate });
     }
 
-  render() {
-    return (
-        <Col>
+    render() {
+        return (
+            <Col>
 
-        <Container className="create-form">
-            <h1>Register</h1>
-            <br />
-            <br />
-            <Form>
-                <Col>
-                    <FormGroup >
-                        <Label>Email</Label>
-                        <Input
-                            required
-                            type="email"
-                            onChange={this.validateEmail}
-                            placeholder="Email"
-                            valid={this.state.validate.emailState === 'has-success'}
-                            invalid={this.state.validate.emailState === 'has-danger'}
-                        />
-                        <FormText>Email that will work as your username</FormText>
-                        <FormFeedback valid>
-                            Valid email!
+                <Container className="create-form">
+                    <h1>Register</h1>
+                    <br />
+                    <br />
+                    <Form>
+                        <Col>
+                            <FormGroup >
+                                <Label>Email</Label>
+                                <Input
+                                    required
+                                    type="email"
+                                    onChange={this.validateEmail}
+                                    placeholder="Email"
+                                    valid={this.state.validate.emailState === 'has-success'}
+                                    invalid={this.state.validate.emailState === 'has-danger'}
+                                />
+                                <FormText>Email that will work as your username</FormText>
+                                <FormFeedback valid>
+                                    Valid email!
                         </FormFeedback>
-                        <FormFeedback invalid>
-                            Please provide a valid email like example@validemail.com
+                                <FormFeedback>
+                                    Please provide a valid email like example@validemail.com
                         </FormFeedback>
-                    </FormGroup >
-                </Col>
-                <Col>
-                    <FormGroup >
-                        <Label>Password</Label>
-                        <Input
-                            required
-                            type="password"
-                            onChange={this.validatePassword}
-                            placeholder="Password"
-                            valid={this.state.validate.passwordState === 'has-success'}
-                            invalid={this.state.validate.passwordState === 'has-danger'}
-                        />
-                        <FormFeedback valid>
-                            Valid password!
+                            </FormGroup >
+                        </Col>
+                        <Col>
+                            <FormGroup >
+                                <Label>Password</Label>
+                                <Input
+                                    required
+                                    type="password"
+                                    onChange={this.validatePassword}
+                                    placeholder="Password"
+                                    valid={this.state.validate.passwordState === 'has-success'}
+                                    invalid={this.state.validate.passwordState === 'has-danger'}
+                                />
+                                <FormFeedback valid>
+                                    Valid password!
                         </FormFeedback>
-                        <FormFeedback invalid>
-                            Minimum eight characters, at least one uppercase letter, one lowercase letter and one number
+                                <FormFeedback>
+                                    Minimum eight characters, at least one uppercase letter, one lowercase letter and one number
                         </FormFeedback>
-                    </FormGroup >
-                </Col>
-                <Col>
-                    <FormGroup >
-                        <Label>Password confirmation</Label>
-                        <Input
-                            required
-                            type="password"
-                            onChange={this.validatePasswordConfirmation}
-                            placeholder="Password"
-                            valid={this.state.validate.passwordConfirmationState === 'has-success'}
-                            invalid={this.state.validate.passwordConfirmationState === 'has-danger'}
-                        />
-                        <FormFeedback valid>
-                            The passwords match!
+                            </FormGroup >
+                        </Col>
+                        <Col>
+                            <FormGroup >
+                                <Label>Password confirmation</Label>
+                                <Input
+                                    required
+                                    type="password"
+                                    onChange={this.validatePasswordConfirmation}
+                                    placeholder="Password"
+                                    valid={this.state.validate.passwordConfirmationState === 'has-success'}
+                                    invalid={this.state.validate.passwordConfirmationState === 'has-danger'}
+                                />
+                                <FormFeedback valid>
+                                    The passwords match!
                         </FormFeedback>
-                        <FormFeedback invalid>
-                            The password fields do not match :/
+                                <FormFeedback>
+                                    The password fields do not match :/
                         </FormFeedback>
-                    </FormGroup >
-                </Col>
-                <Col>
-                    <Button color="success" onClick={this.signup}>
-                        Register
+                            </FormGroup >
+                        </Col>
+                        <Col>
+                            <Button color="success" onClick={this.signup}>
+                                Register
                     </Button>
-                </Col>
-            </Form>
-        </Container>
-    </Col>
-    )
-  }
+                        </Col>
+                    </Form>
+                </Container>
+            </Col>
+        )
+    }
 }

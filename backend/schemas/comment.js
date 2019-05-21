@@ -11,6 +11,7 @@ const CommentSchema = new Schema(
     submissionId:String,
     //ratings:Array,
     userEmail:String,
+    content: String,
   },
   { timestamps: true }
 );

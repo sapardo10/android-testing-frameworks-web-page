@@ -9,6 +9,7 @@ import {
 } from 'reactstrap';
 import { Redirect } from 'react-router-dom';
 import axios from "axios";
+import CommentSection from './CommentSection';
 
 export default class ShowTechnology extends Component {
 
@@ -186,7 +187,7 @@ export default class ShowTechnology extends Component {
         var rate = 0;
         if (amount !== 0) {
             rate = submission.rating / amount;
-            
+
         }
         var user = localStorage.getItem('user');
 
@@ -225,23 +226,23 @@ export default class ShowTechnology extends Component {
     renderEvaluationVideo = () => {
         const submission = this.state.submission;
         const idVideo = submission.youtubeurl;
-        
+
         const opts = {
             width: "560",
             height: "349"
         };
-        if(idVideo){
+        if (idVideo) {
             return (
                 <YouTube
                     videoId={idVideo}
                     opts={opts}
                     onReady={this._onReady}
                 />
-            );            
+            );
         } else {
             return (<div></div>);
         }
-        
+
     }
 
     renderEvaluationDescription = () => {
@@ -334,10 +335,10 @@ export default class ShowTechnology extends Component {
             const user = submi.userEmail;
             const time = submi.createdAt;
             let date = new Date(time);
-            console.log("time",date);
+            console.log("time", date);
             return (
                 <ListGroupItem tag="a" href={route} action key={submi._id}>
-                    <ListGroupItemHeading>{'Sumbmission made by: '+user + ' - Rating: ' + rate + ' - at: ' + date }</ListGroupItemHeading>
+                    <ListGroupItemHeading>{'Sumbmission made by: ' + user + ' - Rating: ' + rate + ' - at: ' + date}</ListGroupItemHeading>
 
                 </ListGroupItem>
             );
@@ -349,13 +350,14 @@ export default class ShowTechnology extends Component {
 
         var screen = this.renderErrorScreen();
         var submissions;
+        var comments;
         if (!this.state.error && this.state.evaluation !== undefined) {
             screen = this.renderEvaluationScreen();
-            console.log("submissions",this.state.evaluation.submissions.length);
-            if(this.state.evaluation.submissions.length > 1){
+            console.log("submissions", this.state.evaluation.submissions.length);
+            if (this.state.evaluation.submissions.length > 1) {
                 submissions = (
                     <div>
-                        <Container>
+                        <Container className="create-form">
                             <h3>Submissions:</h3>
                             <ListGroup>
                                 {this.renderSubmissionsList()}
@@ -363,8 +365,17 @@ export default class ShowTechnology extends Component {
                         </Container>
                     </div>);
             } else {
-                submissions = (<h3>No other submissions</h3>);
+                submissions = (
+                    <Container className="create-form">
+                        <h3>No other submissions</h3>
+                    </Container>);
             }
+        }
+
+        if (!this.state.error && this.state.submission !== undefined && this.state.submission !== null) {
+            comments = (
+                <CommentSection submissionId={this.state.submission.id} />
+            );
         }
 
         return (
@@ -375,6 +386,7 @@ export default class ShowTechnology extends Component {
                 </Alert>
                 {screen}
                 {submissions}
+                {comments}
                 <br />
                 <br />
                 <hr />

@@ -15,7 +15,6 @@ export default class CreateEvaluation extends Component {
   state = {
     techniques: [],
     technologies: [],
-    id: undefined,
     technologyId: undefined,
     techniqueId: undefined,
     technique: undefined,
@@ -27,7 +26,6 @@ export default class CreateEvaluation extends Component {
     githubUrl: undefined,
     evaluation: undefined,
     validate: {
-      idState: '',
       urlState: '',
       youtubeState: '',
       evaluationState: '',
@@ -89,7 +87,6 @@ export default class CreateEvaluation extends Component {
 
   canSubmitForm = () => {
     const {
-      idState,
       evaluationState,
       numericalState,
       githubUrlState
@@ -99,13 +96,11 @@ export default class CreateEvaluation extends Component {
       technique
     } = this.state;
 
-    console.log((idState === 'has-success'))
     console.log((evaluationState === 'has-success'));
     console.log((numericalState === 'has-success'));
     console.log((githubUrlState === 'has-success' || githubUrlState === ''));
     console.log((technology && technique));
-    return (idState === 'has-success')
-      && (evaluationState === 'has-success')
+    return (evaluationState === 'has-success')
       && (numericalState === 'has-success')
       && (githubUrlState === 'has-success' || githubUrlState === '')
       && (technology && technique);
@@ -119,7 +114,6 @@ export default class CreateEvaluation extends Component {
       axios.post("http://localhost:3001/evaluations/create", {
         userId: fire.auth().currentUser.uid,
         userEmail: fire.auth().currentUser.email,
-        id: this.state.id,
         technologyId: this.state.technology.id,
         techniqueId: this.state.technique.id,
         technologyName: this.state.technology.name,
@@ -252,17 +246,6 @@ export default class CreateEvaluation extends Component {
     this.setState({ technology: tech });
   }
 
-  validateId = (e) => {
-    const { validate } = this.state
-    if (e.target.value !== "") {
-      validate.idState = 'has-success'
-      this.setState({ id: e.target.value })
-    } else {
-      validate.idState = 'has-danger'
-    }
-    this.setState({ validate })
-  }
-
   validateUrl = (e) => {
     this.setState({ codesnippet: e.target.value })
   }
@@ -359,26 +342,7 @@ export default class CreateEvaluation extends Component {
               </Input >
             </FormGroup>
           </Col>
-          <Col>
-            <FormGroup >
-              <Label>Id</Label>
-              <Input
-                required
-                type="number"
-                onChange={this.validateId}
-                placeholder="id"
-                valid={this.state.validate.idState === 'has-success'}
-                invalid={this.state.validate.idState === 'has-danger'}
-              />
-              <FormText>Id to identify the evaluation</FormText>
-              <FormFeedback valid>
-                Valid id!
-              </FormFeedback>
-              <FormFeedback >
-                Please provide a valid numerical id
-              </FormFeedback>
-            </FormGroup >
-          </Col>
+      
         </div>
       );
     }

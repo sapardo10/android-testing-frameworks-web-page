@@ -223,7 +223,6 @@ router.post("/create-new", (req, res) => {
     submission.amountRated = 0;
 
     console.log('submission', submission);
-    console.log('evaluation', id);
 
     Evaluation.findOneAndUpdate({ id: id }, {
         $push: {

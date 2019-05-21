@@ -164,7 +164,6 @@ export default class EvaluationMatrix extends Component {
     }
 
     render() {
-        const { activeIndex } = this.state;
         var screen = <div>Nada</div>;
         if (this.state.matrix !== undefined) {
             screen = (<Table dark>

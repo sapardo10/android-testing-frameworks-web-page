@@ -9,6 +9,7 @@ const technologies = require('./routes/technologies');
 const techniques = require('./routes/techniques');
 const evaluations = require('./routes/evaluations');
 const users = require('./routes/users');
+const comments = require('./routes/comments');
 
 const MONGO_USER = process.env.MONGO_USER;
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
@@ -31,6 +32,7 @@ db.once("open", () => console.log("connected to the database"));
 // checks if connection with the database is successful
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
+app.use(express.static(path.join(__dirname, 'client/build')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(logger("dev"));
@@ -39,6 +41,7 @@ app.use('/technologies', technologies);
 app.use('/techniques', techniques);
 app.use('/evaluations', evaluations);
 app.use('/users', users);
+app.use('/comments', comments);
 
 // this is our get method
 // this method fetches all available data in our database

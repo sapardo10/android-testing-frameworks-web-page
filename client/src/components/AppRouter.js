@@ -21,6 +21,7 @@ import {
   Button,
   Alert
 } from 'reactstrap';
+import Profile from "./Profile";
 
 export default class AppRouter extends React.Component {
   constructor(props) {
@@ -75,26 +76,45 @@ export default class AppRouter extends React.Component {
   render() {
     var items = undefined;
     if (this.state.user) {
-      items = (
-        <Collapse isOpen={this.state.isOpen} navbar>
-          <Nav className="ml-auto" navbar>
-            <NavItem>
-              <NavLink href="/">Home</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="/create-evaluation">Create evaluation</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="/create-technology">Create technology</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="/create-technique">Create technique</NavLink>
-            </NavItem>
-            <NavItem><Button onClick={this.signout}>Logout</Button>
-            </NavItem>
-          </Nav>
-        </Collapse>
-      );
+
+      if(this.state.user.email === "prueba33@prueba.com"){
+        items = (
+          <Collapse isOpen={this.state.isOpen} navbar>
+            <Nav className="ml-auto" navbar>
+              <NavItem>
+                <NavLink href="/">Home</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="/create-evaluation">Create evaluation</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="/create-technology">Create technology</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="/create-technique">Create technique</NavLink>
+              </NavItem>
+              <NavItem><Button onClick={this.signout}>Logout</Button>
+              </NavItem>
+            </Nav>
+          </Collapse>
+        );
+      } else {
+        items = (
+          <Collapse isOpen={this.state.isOpen} navbar>
+            <Nav className="ml-auto" navbar>
+              <NavItem>
+                <NavLink href="/">Home</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="/create-evaluation">Create evaluation</NavLink>
+              </NavItem>
+              <NavItem><Button onClick={this.signout}>Logout</Button>
+              </NavItem>
+            </Nav>
+          </Collapse>
+        );
+      }
+      
     } else {
       items = (
         <Collapse isOpen={this.state.isOpen} navbar>
@@ -132,6 +152,8 @@ export default class AppRouter extends React.Component {
             <Route path="/evaluation/:id/:idsubmission?" component={ShowEvaluation} />
             <Route path="/technique/:id" component={ShowTechnique} />
             <Route path="/login" component={Login} />
+            <Route path="/profile" component={Profile} />
+            <Route path="/user/:id" component={Profile} />
           </div>
         </Router>
       </div>

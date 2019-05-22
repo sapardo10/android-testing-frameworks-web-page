@@ -17,14 +17,14 @@ export default class ShowTechnology extends Component {
 
     getEvaluationsOfTechnology = () => {
         const name = this.state.technology.name;
-        fetch("http://localhost:3001/evaluations/technology/" + name)
+        fetch("https://fast-escarpment-67919.herokuapp.com/evaluations/technology/" + name)
             .then(data => data.json())
             .then(res => this.setState({ evaluations: res.data, error: false }))
             .catch(err => this.setState({ error: true }));
     }
 
     getTechnologyFromDb = (id) => {
-        fetch("http://localhost:3001/technologies/get/" + id)
+        fetch("https://fast-escarpment-67919.herokuapp.com/technologies/get/" + id)
             .then(data => data.json())
             .then(res => this.setState({ technology: res.data, error: false }))
             .then(() => {

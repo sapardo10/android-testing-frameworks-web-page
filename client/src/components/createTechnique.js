@@ -60,7 +60,7 @@ export default class CreateTechnique extends Component {
     putDataToDB = () => {
 
         if (this.canSubmitForm()) {
-            axios.post("http://localhost:3001/techniques/create", {
+            axios.post("https://fast-escarpment-67919.herokuapp.com/techniques/create", {
                 id: this.state.id,
                 name: this.state.name,
                 description: this.state.description,
@@ -74,7 +74,6 @@ export default class CreateTechnique extends Component {
                         visible: true,
                     });
                 }
-                console.log(res);
             }).catch((err) => {
                 console.log(err)
                 this.setState({

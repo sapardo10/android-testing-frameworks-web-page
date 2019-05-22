@@ -21,7 +21,7 @@ export default class Profile extends Component {
 
     getComments = () => {
         if (this.state.user) {
-            fetch("http://localhost:3001/users/get/" + this.state.user.uid)
+            fetch("/users/get/" + this.state.user.uid)
                 .then(data => data.json())
                 .then(res => this.setState({ user: res.data }))
                 .catch((err) => {
@@ -37,8 +37,6 @@ export default class Profile extends Component {
 
     render() {
         var userScreen;
-        console.log(this.state.user);
-        console.log(this.props);
         if (this.state.id) {
             userScreen = (<div>{this.state.profileId}</div>);
         } else if (this.state.user !== null && this.state.user !== undefined){

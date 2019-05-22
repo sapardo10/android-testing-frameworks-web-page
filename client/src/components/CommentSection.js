@@ -34,7 +34,7 @@ export default class CommentSection extends Component {
     postComment = () => {
         const currentUser = fire.auth().currentUser;
         if (currentUser && this.state.comment !== '') {
-            axios.post("http://localhost:3001/comments/post/", {
+            axios.post("https://fast-escarpment-67919.herokuapp.com/comments/post/", {
                 userId: currentUser.uid,
                 userEmail: currentUser.email,
                 content: this.state.comment,
@@ -56,7 +56,7 @@ export default class CommentSection extends Component {
     }
 
     getComments = () => {
-        fetch("http://localhost:3001/comments/get/" + this.state.submissionId)
+        fetch("https://fast-escarpment-67919.herokuapp.com/comments/get/" + this.state.submissionId)
             .then(data => data.json())
             .then(res => this.setState({ comments: res.data }))
             .catch((err) => {
@@ -81,13 +81,12 @@ export default class CommentSection extends Component {
     }
 
     renderComments = () => {
-        console.log("render comments:", this.state.comments)
         if (this.state.comments !== null) {
 
-            return this.state.comments.map((comment) => {
+            return this.state.comments.map((comment,id) => {
                 const time = comment.createdAt;
                 let date = new Date(time);
-                return (<ListGroupItem>
+                return (<ListGroupItem key={id}>
                     <ListGroupItemHeading>{comment.content}</ListGroupItemHeading>
                     <ListGroupItemText>
                         {comment.userEmail} at {' ' + date}
@@ -114,7 +113,6 @@ export default class CommentSection extends Component {
     }
 
     render() {
-        console.log("Comments: ", this.state.comments);
         return (
 
             <div>

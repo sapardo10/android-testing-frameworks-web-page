@@ -16,7 +16,7 @@ export default class ShowTechnique extends Component {
     }
 
     getTechnologyFromDb = (id) => {
-        fetch("http://localhost:3001/techniques/get/" + id)
+        fetch("https://fast-escarpment-67919.herokuapp.com/techniques/get/" + id)
             .then(data => data.json())
             .then(res => this.setState({ technique: res.data, error: false }))
             .then(() => {
@@ -29,7 +29,7 @@ export default class ShowTechnique extends Component {
 
     getEvaluationsOfTechnique = () => {
         const name = this.state.technique.name;
-        fetch("http://localhost:3001/evaluations/technique/" + name)
+        fetch("https://fast-escarpment-67919.herokuapp.com/evaluations/technique/" + name)
             .then(data => data.json())
             .then(res => this.setState({ evaluations: res.data, error: false }))
             .catch(err => this.setState({ error: true }));

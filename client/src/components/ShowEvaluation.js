@@ -10,6 +10,7 @@ import {
 import { Redirect } from 'react-router-dom';
 import axios from "axios";
 import CommentSection from './CommentSection';
+import fire from '../config/Fire';
 
 export default class ShowTechnology extends Component {
 
@@ -35,7 +36,7 @@ export default class ShowTechnology extends Component {
 
     changeRating = (newRating, name) => {
         const user = localStorage.getItem('user');
-        axios.post("http://localhost:3001/evaluations/set-rating/", {
+        axios.post("https://fast-escarpment-67919.herokuapp.com/evaluations/set-rating/", {
             id: this.state.evaluation.id,
             userId: user,
             rating: newRating,
@@ -80,7 +81,7 @@ export default class ShowTechnology extends Component {
     }
 
     getEvaluationFromDb = (id) => {
-        fetch("http://localhost:3001/evaluations/get/" + id)
+        fetch("https://fast-escarpment-67919.herokuapp.com/evaluations/get/" + id)
             .then(data => data.json())
             .then((res) => this.renderEvaluation(res))
             .catch((err) => {
@@ -93,7 +94,7 @@ export default class ShowTechnology extends Component {
     }
 
     getRatingsFromUser = (evaluationId, userId) => {
-        fetch("http://localhost:3001/evaluations/get-rating/?userId=" + userId + "&submissionId=" + evaluationId)
+        fetch("https://fast-escarpment-67919.herokuapp.com/evaluations/get-rating/?userId=" + userId + "&submissionId=" + evaluationId)
             .then(data => data.json())
             .then((res) => {
                 if (res.data) {
@@ -139,7 +140,7 @@ export default class ShowTechnology extends Component {
     }
 
     getTechniquesFromDb = () => {
-        fetch("http://localhost:3001/techniques/get")
+        fetch("https://fast-escarpment-67919.herokuapp.com/techniques/get")
             .then(data => data.json())
             .then(res => this.setState({ techniques: res.data }))
             .catch((err) => {
@@ -151,7 +152,7 @@ export default class ShowTechnology extends Component {
     };
 
     getTechnologyFromDb = () => {
-        fetch("http://localhost:3001/technologies/get/" + this.state.name)
+        fetch("https://fast-escarpment-67919.herokuapp.com/technologies/get/" + this.state.name)
             .then(data => data.json())
             .then(res => this.setState({ technology: res.data }))
             .catch((err) => {
@@ -335,7 +336,6 @@ export default class ShowTechnology extends Component {
             const user = submi.userEmail;
             const time = submi.createdAt;
             let date = new Date(time);
-            console.log("time", date);
             return (
                 <ListGroupItem tag="a" href={route} action key={submi._id}>
                     <ListGroupItemHeading>{'Sumbmission made by: ' + user + ' - Rating: ' + rate + ' - at: ' + date}</ListGroupItemHeading>
@@ -353,7 +353,6 @@ export default class ShowTechnology extends Component {
         var comments;
         if (!this.state.error && this.state.evaluation !== undefined) {
             screen = this.renderEvaluationScreen();
-            console.log("submissions", this.state.evaluation.submissions.length);
             if (this.state.evaluation.submissions.length > 1) {
                 submissions = (
                     <div>
@@ -373,9 +372,14 @@ export default class ShowTechnology extends Component {
         }
 
         if (!this.state.error && this.state.submission !== undefined && this.state.submission !== null) {
-            comments = (
-                <CommentSection submissionId={this.state.submission.id} />
-            );
+            if(fire.auth().currentUser){
+                comments = (
+                    <CommentSection submissionId={this.state.submission.id} />
+                );
+            } else {
+                comments = (<Container className="create-form"><h3>To see the comments please log in</h3></Container>);
+            }
+            
         }
 
         return (

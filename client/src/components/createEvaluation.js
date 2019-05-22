@@ -66,7 +66,7 @@ export default class CreateEvaluation extends Component {
   }
 
   getEvaluationFromDb = (id) => {
-    fetch("http://localhost:3001/evaluations/get/" + id)
+    fetch("https://fast-escarpment-67919.herokuapp.com/evaluations/get/" + id)
       .then(data => data.json())
       .then(res => this.setState({ evaluation: res.data, error: false }))
       .catch(err => this.setState({ error: true }));
@@ -74,13 +74,13 @@ export default class CreateEvaluation extends Component {
 
 
   getTechniquesFromDb = () => {
-    fetch("http://localhost:3001/techniques/get")
+    fetch("https://fast-escarpment-67919.herokuapp.com/techniques/get")
       .then(data => data.json())
       .then(res => this.setState({ techniques: res.data }));
   };
 
   getTechnologiesFromDb = () => {
-    fetch("http://localhost:3001/technologies/get")
+    fetch("https://fast-escarpment-67919.herokuapp.com/technologies/get")
       .then(data => data.json())
       .then(res => this.setState({ technologies: res.data }));
   };
@@ -95,11 +95,7 @@ export default class CreateEvaluation extends Component {
       technology,
       technique
     } = this.state;
-
-    console.log((evaluationState === 'has-success'));
-    console.log((numericalState === 'has-success'));
-    console.log((githubUrlState === 'has-success' || githubUrlState === ''));
-    console.log((technology && technique));
+    console.log(this.state);
     return (evaluationState === 'has-success')
       && (numericalState === 'has-success')
       && (githubUrlState === 'has-success' || githubUrlState === '')
@@ -111,7 +107,7 @@ export default class CreateEvaluation extends Component {
   // to create new query into our data base
   addEvaluation = () => {
     if (this.canSubmitForm()) {
-      axios.post("http://localhost:3001/evaluations/create", {
+      axios.post("https://fast-escarpment-67919.herokuapp.com/evaluations/create", {
         userId: fire.auth().currentUser.uid,
         userEmail: fire.auth().currentUser.email,
         technologyId: this.state.technology.id,
@@ -132,7 +128,6 @@ export default class CreateEvaluation extends Component {
             visible: true,
           });
         }
-        console.log(res);
       }).catch((err) => {
         console.log(err)
         this.setState({
@@ -165,7 +160,7 @@ export default class CreateEvaluation extends Component {
   addNewEvaluation = () => {
     if (this.canSubmitNewEvaluationForm()) {
       const { evaluation } = this.state;
-      axios.post("http://localhost:3001/evaluations/create-new", {
+      axios.post("https://fast-escarpment-67919.herokuapp.com/evaluations/create-new", {
         userId: fire.auth().currentUser.uid,
         userEmail: fire.auth().currentUser.email,
         id: evaluation.id,
@@ -183,7 +178,6 @@ export default class CreateEvaluation extends Component {
             visible: true,
           });
         }
-        console.log(res);
       }).catch((err) => {
         console.log(err)
         this.setState({
@@ -204,7 +198,7 @@ export default class CreateEvaluation extends Component {
   updateEvaluation = () => {
     let objIdToUpdate = this.state.idtechnique;
 
-    axios.post("http://localhost:3001/evaluations/update", {
+    axios.post("https://fast-escarpment-67919.herokuapp.com/evaluations/update", {
       id: objIdToUpdate,
       update: { message: "" }
     });
@@ -229,12 +223,8 @@ export default class CreateEvaluation extends Component {
   onChangeTechnique = (event) => {
     event.preventDefault();
     var target = event.target.value;
-    console.log(target)
     var id = parseInt(target, 10);
-    console.log("technique", id);
-    console.log(this.state.techniques);
     var tech = this.state.techniques[id];
-    console.log("technique", tech);
     this.setState({ technique: tech });
   }
 
@@ -342,7 +332,7 @@ export default class CreateEvaluation extends Component {
               </Input >
             </FormGroup>
           </Col>
-      
+
         </div>
       );
     }
@@ -361,6 +351,7 @@ export default class CreateEvaluation extends Component {
               <FormGroup>
                 <Label>Code snippet</Label>
                 <Input
+                  maxLength="100"
                   type="text"
                   name="codesnippet"
                   onChange={this.validateUrl}
@@ -374,6 +365,7 @@ export default class CreateEvaluation extends Component {
               <FormGroup>
                 <Label>Youtube Url</Label>
                 <Input
+                  maxLength="100"
                   type="text"
                   onChange={this.validateYoutube}
                   placeholder="youtubeurl"
@@ -385,6 +377,7 @@ export default class CreateEvaluation extends Component {
               <FormGroup>
                 <Label>Evaluation</Label>
                 <Input
+                  maxLength="1000"
                   type="textarea"
                   onChange={this.validateEvaluation}
                   valid={this.state.validate.evaluationState === 'has-success'}
@@ -404,7 +397,7 @@ export default class CreateEvaluation extends Component {
                   valid={this.state.validate.numericalState === 'has-success'}
                   invalid={this.state.validate.numericalState === 'has-danger'}
                 />
-                <FormText>Rate the suitability from 1 to 10</FormText>
+                <FormText>Rate the suitability from 1 to 5</FormText>
                 <FormFeedback valid>
                   Valid rating!
               </FormFeedback>
@@ -418,6 +411,7 @@ export default class CreateEvaluation extends Component {
               <FormGroup>
                 <Label>Github url</Label>
                 <Input
+                  maxLength="100"
                   type="text"
                   onChange={this.validateGithubUrl}
                   placeholder="github url"

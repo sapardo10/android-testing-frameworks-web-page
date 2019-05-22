@@ -65,9 +65,8 @@ export default class CreateTechnology extends Component {
     }
 
     putDataToDB = () => {
-        console.log("can submit",this.canSubmitForm())
         if(this.canSubmitForm()){
-            axios.post("http://localhost:3001/technologies/create", {
+            axios.post("https://fast-escarpment-67919.herokuapp.com/technologies/create", {
             id: this.state.id,
             name: this.state.name,
             creator: this.state.creator,
@@ -83,7 +82,6 @@ export default class CreateTechnology extends Component {
                     visible: true,
                 });
             }
-            console.log(res);
         }).catch((err) => {
             console.log(err)
             this.setState({

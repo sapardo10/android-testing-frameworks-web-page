@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
-    Table, Container, Card, 
+    Table, Container, Card,
     CardTitle, CardText, Button,
-    Jumbotron, ListGroup, ListGroupItem, 
+    Jumbotron, ListGroup, ListGroupItem,
     ListGroupItemHeading, ListGroupItemText
 } from 'reactstrap';
 import { Redirect } from 'react-router-dom';
@@ -29,7 +29,7 @@ export default class EvaluationMatrix extends Component {
     }
 
     getTechniquesFromDb = () => {
-        fetch("http://localhost:3001/techniques/get")
+        fetch("https://fast-escarpment-67919.herokuapp.com/techniques/get")
             .then(data => data.json())
             .then(res => this.setState((preState) => {
                 return {
@@ -41,7 +41,7 @@ export default class EvaluationMatrix extends Component {
     };
 
     getTechnologiesFromDb = () => {
-        fetch("http://localhost:3001/technologies/get")
+        fetch("https://fast-escarpment-67919.herokuapp.com/technologies/get")
             .then(data => data.json())
             .then(res => this.setState((preState) => {
                 return {
@@ -53,7 +53,7 @@ export default class EvaluationMatrix extends Component {
     };
 
     getEvaluationsFromDb = () => {
-        fetch("http://localhost:3001/evaluations/get")
+        fetch("https://fast-escarpment-67919.herokuapp.com/evaluations/get")
             .then(data => data.json())
             .then(res => this.setState((preState) => {
                 return {
@@ -87,7 +87,6 @@ export default class EvaluationMatrix extends Component {
     }
 
     renderRedirect = () => {
-        console.log('redirect')
         if (this.state.redirect) {
             const route = '/';
             return <Redirect to={route} />
@@ -111,7 +110,7 @@ export default class EvaluationMatrix extends Component {
         return this.state.techniques.map((technique) => {
             const route = './technique/' + technique.id;
             return (
-                <ListGroupItem key = {technique.name} tag="a" href={route} action>
+                <ListGroupItem key={technique.name} tag="a" href={route} action>
                     <ListGroupItemHeading>{technique.name}</ListGroupItemHeading>
                     <ListGroupItemText>
                         {technique.description.substring(0, 60) + "..."}</ListGroupItemText>
@@ -131,8 +130,8 @@ export default class EvaluationMatrix extends Component {
 
     renderRows = () => {
         var arr = this.state.matrix;
-        return arr.map((row,j) => {
-            return <tr key={j}>{row.map((cell,i) => {
+        return arr.map((row, j) => {
+            return <tr key={j}>{row.map((cell, i) => {
                 if (cell !== undefined) {
                     const route = "../evaluation/" + cell.id;
                     const submission = cell.submissions[0];
@@ -147,17 +146,23 @@ export default class EvaluationMatrix extends Component {
                     } else if (rate > 4 && submission.numericalEvaluation <= 5) {
                         color = "success"
                     }
-                    return <td key ={cell.techniqueName + "-" + cell.technologyName}>
+                    return <td key={cell.techniqueName + "-" + cell.technologyName}>
                         <Card body inverse color={color}>
                             <CardTitle>{cell.techniqueName + "-" + cell.technologyName}</CardTitle>
-                            <CardText>{submission.textEvaluation.substring(0, 50) + "..."}</CardText> 
+                            <CardText>{submission.textEvaluation.substring(0, 50) + "..."}</CardText>
                             <Button color="secondary" href={route}>
                                 See details
                             </Button>
                         </Card>
                     </td>
                 } else {
-                    return <td key={i}>No data available</td>
+                    const route = "../create-evaluation"
+                    return <td key={i}>
+                        No data available
+                        <Button color="info" href={route}>
+                            Add evaluation
+                        </Button>
+                        </td>
                 }
             })}</tr>
         });

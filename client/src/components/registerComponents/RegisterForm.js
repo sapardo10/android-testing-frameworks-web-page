@@ -29,13 +29,12 @@ export default class RegisterForm extends Component {
             && this.isValid('passwordState')
             && this.isValid('passwordConfirmationState')) {
             fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((u) => {
-                
+
                 const user = u.user;
-                axios.post("http://localhost:3001/users/create", {
+                axios.post("/users/create", {
                     id: user.uid,
                     email: user.email,
                 }).then((res) => {
-                    console.log(res.data);
                     if (res.data.success === true) {
                         this.setRedirect();
                     } else {
@@ -44,7 +43,6 @@ export default class RegisterForm extends Component {
                             visible: true,
                         });
                     }
-                    console.log(res);
                 }).catch((err) => {
                     console.log(err)
                     this.setState({
@@ -107,6 +105,7 @@ export default class RegisterForm extends Component {
                             <FormGroup >
                                 <Label>Email</Label>
                                 <Input
+                                    maxLength="100"
                                     required
                                     type="email"
                                     onChange={this.validateEmail}
@@ -127,6 +126,7 @@ export default class RegisterForm extends Component {
                             <FormGroup >
                                 <Label>Password</Label>
                                 <Input
+                                    maxLength="100"
                                     required
                                     type="password"
                                     onChange={this.validatePassword}
@@ -146,6 +146,7 @@ export default class RegisterForm extends Component {
                             <FormGroup >
                                 <Label>Password confirmation</Label>
                                 <Input
+                                    maxLength="100"
                                     required
                                     type="password"
                                     onChange={this.validatePasswordConfirmation}

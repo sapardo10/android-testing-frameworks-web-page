@@ -14,7 +14,7 @@ const comments = require('./routes/comments');
 const MONGO_USER = process.env.MONGO_USER;
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
 
-const API_PORT = 3001;
+const API_PORT = process.env.PORT || 3001;
 const app = express();
 const router = express.Router();
 
@@ -35,6 +35,7 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(logger("dev"));
+
 app.use(cors());
 app.use('/technologies', technologies);
 app.use('/techniques', techniques);
